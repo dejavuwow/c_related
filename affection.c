@@ -2,6 +2,6 @@
 int main(void)
 {
 	int integer = 10;
-	return 10
+	return 10;
 }
 
