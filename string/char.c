@@ -1,9 +1,8 @@
 #include <stdio.h>
 int main(void)
 {
-	char test[] = "my stick";
-	printf("%-7.2s\n", test);
+	for(char i = 0; i < 127; ++i) 
+		printf("%d\n", i);
 	getchar();
 	return 0;
 }
-
