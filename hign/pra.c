@@ -1,8 +1,24 @@
 #include <stdio.h>
+#include <stdlib.h>
+_Bool isInclude(int arr[], int n, int num);
 
 int main(void)
 {
-
 }
-//指针传递快，会改变原始数据。结构传递慢，但不会修改原始数据
-//
+_Bool isInclude(int arr[], int n, int num)
+{
+	int max = n - 1;
+	int min = 0;
+	int mid;
+	while (min <= max)
+	{
+		mid = (min + max) / 2;
+		if (arr[mid] == num)
+			return 1;
+		else if (arr[mid] > num)
+			max = mid - 1;
+		else
+			min = mid + 1;
+	}
+	return 0;
+}

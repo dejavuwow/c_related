@@ -1,4 +1,8 @@
 #include <stdio.h>
+int main(int n, char *args[])
+{
+	for (int i = 0; i < n; i++)
+		printf("%s \n", args[i]);
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
@@ -37,4 +41,3 @@ int main(int n, char *args[])
 
 	return 0;
 }
-
