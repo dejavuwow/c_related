@@ -1,14 +1,17 @@
 #include <stdio.h>
-extern int a;
+#include <assert.h>
+int jiang;
 int main(void)
 {
+	int b;
 	int xy;
+	int a; 
 	a = 20;
 	char *arr = "nihao";
+	assert(a == 20);
 	arr = "buhao";
 	{
-		extern int a;
-		printf("%d", a);
+		printf("%d %d", jiang, b);
 	}
 	puts(arr);
 	return 0;

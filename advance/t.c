@@ -17,11 +17,13 @@ int main(void)
 	enum Liquid jar;
 	jar = QUART;
 	struct box_propx {
-		unsigned long long int opque: 33;
-		unsigned long long int: 0;
+		unsigned long int opque: 32;
+		unsigned long int: 0;
+		/* unsigned long int: 2; */
 	};
 	char *somedday;
-	printf("%d, %d\n", (int)(as >= 123)+(int)(as < 123), somedday);
+	/* printf("%d, %d\n", (int)(as >= 123)+(int)(as < 123), somedday); */
+	printf("%u", sizeof(struct box_propx));
 	/* switch (as) */
 	/* { */
 		/* case (int)(as >= 100): */
