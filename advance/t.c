@@ -21,9 +21,12 @@ int main(void)
 		unsigned long int: 0;
 		/* unsigned long int: 2; */
 	};
-	char *somedday;
+	char abc[] = "234";
+	char *somedday = abc;
 	/* printf("%d, %d\n", (int)(as >= 123)+(int)(as < 123), somedday); */
-	printf("%u", sizeof(struct box_propx));
+	/* printf("%u", sizeof(struct box_propx)); */
+	printf("%s %c\n", somedday, *somedday);
+	perror("Error: just a test");
 	/* switch (as) */
 	/* { */
 		/* case (int)(as >= 100): */

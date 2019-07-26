@@ -2,6 +2,7 @@
 #include <string.h>
 #include "test.h"
 static int c = 3;
+extern "C"
 int d = 4;
 int main(void)
 {
