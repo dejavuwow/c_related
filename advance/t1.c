@@ -5,5 +5,5 @@
 /* #define LARGE 100 */
 void print(void)
 {
-	printf("%d", S);
+	printf("%d", 9);
 }
