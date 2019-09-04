@@ -10,4 +10,17 @@ int main(int argc, char const *argv[])
 		/* fflush(stdout); */
 		fprintf(stderr, "2");
 	}
+	int print(void)
+	{
+		printf("\nnkihao\n");
+	}
+	int (*pf)();
+	pf = &print;
+	char *first;
+	char tc[] = "nihao";
+	printf("\n%p, %p\n", &first, first);
+	first = tc;
+	printf("%p, %p", &first, first);
+
+	return 0;
 }
