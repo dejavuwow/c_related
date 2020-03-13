@@ -12,6 +12,10 @@ int abc(int x)
 	printf("^^%d\n",(x + y) ^ y);
 	return  (x ^ y) - y;
 }
+int getMaxLength()
+{
+	
+}
 int main(void)
 {
 	int b = 25;
@@ -28,3 +32,12 @@ int main(void)
 	printf("**%d", abc(-230));
 	return 0;
 }
+// 115  1
+//  57  1
+//  28  0
+//  14  0
+//  7  1
+//  3	1
+//  1  1
+I//1111 1111
+//1111 1111

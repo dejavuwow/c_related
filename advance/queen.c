@@ -57,13 +57,13 @@ void moveQueen(int position[], int row)
 {
 	if (row == ROW)
 	{
+		result_count++;
 		showBoard(position);
 		return;
 	}
 	for (int i = 0; i < COL; i++)
 	{
 	
-		result_count++;
 		position[row] = i;
 		if (checkConflict(position, row))
 		{
