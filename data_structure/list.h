@@ -18,7 +18,7 @@ typedef struct List
 	ListElmt *head;
 	ListElmt *tail;
 
-}
+} List;
 
 void list_init(List *list, void (*destroy)(void *data));
 void list_destroy(List *list);
