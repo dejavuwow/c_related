@@ -2,9 +2,12 @@
 #include <stdlib.h>
 #define AVL_LEFT_HEAVY 2
 #define AVL_RIGHT_HEAVY -2
+#define GET_HEIGHT(node) (node == NULL ? 0 : (node)->height)
+#define GET_BALFACTOR(node) (node == NULL ? 0 : GET_HEIGHT((node)->left) - GET_HEIGHT((node)->right))
 
 typedef struct Node {
 	int value;
+	int height;
 	struct Node *left;
 	struct Node *right;
 } Node;
@@ -13,44 +16,15 @@ typedef struct Avl {
 	Node *root;
 
 } Avl;
-
-static int getLeftHeight(Node *node)
+//
+static int insertNode(Node *root, Node *newNode)
 {
-	int height = 0;
-	while (node->left != NULL)
-	{
-		height++;
-		node = node->left;
-	}
-	return height;
+
 }
-
-
-
-static int getRightHeight(Node *node)
+static int insert(Node *root, Node *newNode)
 {
-	int height = 0;
-	while (node->right != NULL)
-	{
-		height++;
-		node = node->right;
-	}
+	Node * const node = root;
 
-	return height;
-}
-
-static int getNodeBalFactor(Node *node)
-{
-	return getLeftHeight(node) - getRightHeight(node);
-}
-
-static int insert(Avl *tree, int value)
-{
-	Node *node = tree->root;
-	Node *temp = node;
-
-	Node newNode = (Node *)malloc(sizeof(Node));
-	if (newNode == NULL) return -1;
 	newNode->value = value;
 
 	while (1)

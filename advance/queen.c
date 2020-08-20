@@ -46,7 +46,7 @@ int checkConflict(int position[], int row)
 	for (int i = 0; i < row; i++)
 	{
 		if (position[i] == position[row] ||
-				abs(i - row)== abs(position[i] - position[row])
+				fabs(i - row)== fabs(position[i] - position[row])
 				)
 			return 0;
 	}
