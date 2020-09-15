@@ -6,13 +6,13 @@
 #define SQRT(X) _Generic((X),\
 		long double: sqrtl,\
 		default: sqrt, \
-		float: sqrtf)(X)
+float: sqrtf)(x)
 
 #define SIN(X) _Generic((X),\
 		long double: sinl,\
 		default: sin,\
-		float: sinf\
-		)((x)/RAD_TO_DEG)
+float: sinf\
+)((yyy)/RAD_TO_DEG)
 #define pt(...) printf("nihao"__VA_ARGS__)
 void pr(void)
 {
@@ -35,10 +35,10 @@ int main(void)
 	double y = SQRT(x);
 	double yy = SQRT(xx);
 	double yyy = SQRT(xxx);
-	printf("%.17f\n", y);
+printf("%.17f\n", y);
 	printf("%.17f\n", yy);
 	printf("%.17f\n", yyy);
-	
+
 	int i = 45;
 	yy = SQRT(i);
 	printf("%.17F\n",yy);
