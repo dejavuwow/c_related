@@ -77,7 +77,7 @@ int main(void)
 	}
 	queue *list = (queue *)malloc(sizeof(queue));
 	queueInit(list);
-	removeNode(&mainTree.root, 12);
+	/** removeNode(&mainTree.root, 12); */
 	/** traverse2(mainTree.root); */
 	traverse(mainTree.root, list);
 	return 0;

@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
-
+//993433
 #define RESETARRAY(array, size) \
 {\
 	for (int i = 0; i < size; i++)\
@@ -29,29 +29,34 @@ int radixsort(int array[], int size, int p, int k)
 		{
 
 			index = (array[i] % (remain * k)) / remain;
+			printf("%d\t", index);
 			counts[index]++;
 		}
 
 		for (i = 1; i < k; i++)
 			counts[i] += counts[i - 1];
 
-		for (i = size - 1; i >= 0; i--)
+		putchar('\n');
+		for (i = 0; i < size; i++)
 		{
 
+			printf("%d\t", array[i]);
 			index = (array[i] % (remain * k)) / remain;
 			temp[counts[index] - 1] = array[i];
 			counts[index]--;
 		}
 		putchar('\n');
-	/** for (int *p = temp; p < temp + size; p++) */
-	/**     printf("%d\t", *p); */
+		for (int *p = temp; p < temp + size; p++)
+			printf("%d\t", *p);
+		putchar('\n');
+		putchar('\n');
 		memcpy(array, temp, size * sizeof(int));
 	} 
 	return 0;
 }
 int main(void)
 {
-	int array[] = {23,19,100, 43, 7, 35};
+	int array[] = {23,19,150, 43, 7, 35};
 	int *tp = array;
 	radixsort(array, 6, 3, 10);
 	printf("%d %d\n", sizeof(array), sizeof(tp));

@@ -26,6 +26,12 @@ int main(int argc, char *argv[])
 		}
 
 	}
+
+	short int test = 0x1122;
+	char *x1, *x2;
+	x1 = (char*)(&test);
+	x2 = x1+1;
+	printf("%llx, %llx\n", *x1, *x2);
 }
 
 long int count_char(FILE *fp, char seek)

@@ -185,8 +185,8 @@ void removeNode(avlNode **root, int value)
 				removeNode(&(*root)->right, value);
 
 			(*root)->height = MAX(GET_HEIGHT((*root)->left), GET_HEIGHT((*root)->right)) + 1;
+			(*root) = setbalance(*root);
 		}
 	}
 
-	(*root) = setbalance(*root);
 }

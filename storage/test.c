@@ -1,4 +1,5 @@
 #include <stdio.h>
+int a1;
 int main(void)
 {
 	float i;
@@ -9,7 +10,7 @@ int main(void)
 	/* getchar(); */
 	/* scanf("%f",&j); */
 	/* getchar(); */
-	printf("%6.4hhd, %hu", a, b);
+	printf("%d", a1);
 	getchar();
 
 	return 0;
