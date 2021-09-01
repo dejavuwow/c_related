@@ -3,7 +3,7 @@
 int main(void)
 {
 	int minutes;  //声明输入的分钟数
-
+	printf("%2.3e\n",2.2311);
 	printf("Please enter minutes to be converted:");
 	scanf("%d",&minutes);
 	printf("%d\n",minutes);

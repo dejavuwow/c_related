@@ -1,6 +1,13 @@
-#define BI 8
 #include <stdio.h>
-void eatline(void)
+#define BI 8 
+#define pr(x) puts("just"#x)
+#define pp(x) pr(yest#x)
+#define LOOK(x) you##x
+#include <stdio.h>
+int main(void)
 {
-	puts("ye you!");
+	int LOOK(2) = 4;
+	pp(4);
+	return 0;
+
 }

@@ -2,7 +2,7 @@
 #include <stdio.h>
 #define SQUARE(X) (X * X)
 #define PR(X) printf("The result " #X " is %d.\n",X)
-#define XNAME(n) "a" #n "nihao"
+#define XNAME(n)  #n##2
 #define PRINT(x, ...) printf(#x " "__VA_ARGS__)
 #define MUL(x)  (x * x)
 int sq(int x)
