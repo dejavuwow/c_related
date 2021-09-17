@@ -305,11 +305,12 @@ char *genStr(char *str)
 	char *newStr = (char*)malloc(sizeof(char));
 	newStr[0] = '\0';
 	char tt[3] = {'\0'};
-	char *temp = str + 1;
-	for (; *temp != '\0'; temp++) {
-		if (*temp != *(temp - 1)) {
+	//char *temp = str + 1;
+	//printf("%s\n", str);
+	for (char *temp = str; *temp != '\0'; temp++) {
+		if (*temp != *(temp + 1)) {
 			tt[0] = i + 0x30;
-			tt[1] = *(temp - 1);
+			tt[1] = *temp;
 			realloc(newStr, n += 2);
 			strcat(newStr, tt);
 			i = 1;
@@ -319,24 +320,28 @@ char *genStr(char *str)
 		/** printf("%s\n", tt); */
 		/** printf("%s", newStr); */
 	}
-		tt[0] = i + 0x30;
-			tt[1] = *(temp - 1);
-			realloc(newStr, n += 2);
-			strcat(newStr, tt);
-
+	free(str);
 
 	return newStr;
 }
 char * countAndSay(int n){
-	char *first = (char*)malloc(sizeof(char) * 2);
+	char *str = (char*)malloc(sizeof(char) * 2);
+	str[0] = '1';
+	str[1] = '\0';
 	while(n > 1) {
+		str = genStr(str);
+		n--;
 	}
-	return first;
+	return str;
 }
 int main(void)
 {
 	//printf("%d", strStr("ah", "h"));
-	printf("%s", genStr("111221"));
+	//printf("%s", genStr("111221"));
+	printf("%s", countAndSay(5));
+	/** printf("%s", countAndSay(2)); */
+	/** printf("%s", countAndSay(3)); */
+	/** printf("%s", countAndSay(4)); */
 	//printf("%d", isPalindrome("A man, a plan, a canal: Panama"));
 	//printf("%d", myAtoi("-91283472332"));
 
