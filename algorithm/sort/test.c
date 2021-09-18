@@ -129,35 +129,35 @@ int reverse(int x){
 
 }
 struct my_struct {
-    int id;                    /* key */
+	int id;                    /* key */
 	int num;
-    UT_hash_handle hh;         /* makes this structure hashable */
+	UT_hash_handle hh;         /* makes this structure hashable */
 };
 
 struct my_struct *users = NULL; 
 
 void delete_all() {
-  struct my_struct *current_user, *tmp;
+	struct my_struct *current_user, *tmp;
 
-  HASH_ITER(hh, users, current_user, tmp) {
-    HASH_DEL(users,current_user);  /* delete; users advances to next */
-    free(current_user);            /* optional- if you want to free  */
-  }
+	HASH_ITER(hh, users, current_user, tmp) {
+		HASH_DEL(users,current_user);  /* delete; users advances to next */
+		free(current_user);            /* optional- if you want to free  */
+	}
 }
 void add_user(int user_id){
-    struct my_struct *s;
+	struct my_struct *s;
 
-    s = malloc(sizeof(struct my_struct));
-    s->id = user_id;
+	s = malloc(sizeof(struct my_struct));
+	s->id = user_id;
 	s->num = 1;
-    HASH_ADD_INT( users, id, s );  /* id: name of key field */
+	HASH_ADD_INT( users, id, s );  /* id: name of key field */
 }
 
 struct my_struct *find_user(int user_id) {
-    struct my_struct *s;
+	struct my_struct *s;
 
-    HASH_FIND_INT( users, &user_id, s );  /* s: output pointer */
-    return s;
+	HASH_FIND_INT( users, &user_id, s );  /* s: output pointer */
+	return s;
 }
 #define my you
 #define you 'n'
@@ -186,7 +186,7 @@ bool isAnagram(char * s, char * t){
 	return ret;
 }
 #define CHECK_ASC(c) (\
-		  ((c) >= 0x30 && (c) <= 0x39)\
+		((c) >= 0x30 && (c) <= 0x39)\
 		? true\
 		: ((c) >= 0x41 && (c) <= 0x5a)\
 		? true\
@@ -212,14 +212,14 @@ bool isPalindrome(char * s){
 	int tail = length - 1;
 
 	while (&s[head] < &s[tail]) {
-		 if (!CHECK_ASC(s[head])) {
+		if (!CHECK_ASC(s[head])) {
 			head++;
 			continue;
-		 } 
-		 if (!CHECK_ASC(s[tail])) {
-			 tail--;
-			 continue;
-		 }
+		} 
+		if (!CHECK_ASC(s[tail])) {
+			tail--;
+			continue;
+		}
 		if (!CHECK_EQUAL(s[head], s[tail]))	{
 			printf("%c %c\n", s[head], s[tail]);
 			ret = false;
@@ -245,8 +245,8 @@ int myAtoi(char * s){
 			int a = ((long long)ret * 10) + sign * (*temp - '0');
 			if ((a - sign * (*temp - '0')) / 10 != ret) {
 				printf("***");
-					ret = sign == -1 ? -0x80000000 : 0x7fffffff;
-					break;
+				ret = sign == -1 ? -0x80000000 : 0x7fffffff;
+				break;
 			} 
 			ret = ret * 10 + sign * (*temp - '0');
 			temp++;
@@ -298,12 +298,14 @@ int strStr(char * haystack, char * needle){
 //312211
 //12112221
 //1112213211
+
 char *genStr(char *str)
 {
 	int i = 1;
 	int n = 1;
 	char *newStr = (char*)malloc(sizeof(char));
-	newStr[0] = '\0';
+	newStr[0] = '1';
+	newStr[1] = '\0';
 	char tt[3] = {'\0'};
 	//char *temp = str + 1;
 	//printf("%s\n", str);
@@ -311,8 +313,8 @@ char *genStr(char *str)
 		if (*temp != *(temp + 1)) {
 			tt[0] = i + 0x30;
 			tt[1] = *temp;
-			realloc(newStr, n += 2);
-			strcat(newStr, tt);
+			realloc(newStr, n += 3);
+			strncat(newStr, "nih", 2);
 			i = 1;
 		} else {
 			i++;
@@ -334,11 +336,89 @@ char * countAndSay(int n){
 	}
 	return str;
 }
+char * longestCommonPrefix(char (*strs)[5], int strsSize){
+	char *commonPrefix = (char*)malloc(sizeof(char) * 201) ;
+	int index = 0;
+	char temp;
+	int end = 0;
+	for (int i = 0; strs[0][i] != '\0'; i++) {
+		temp = strs[0][i];
+		for (int j = 1; j < strsSize; j++) {
+			if (temp != strs[j][i]) {
+				end = 1;
+				break;
+			};
+		}
+		if (end) break;
+		else {
+			commonPrefix[index++] = temp;
+		}
+	}
+	commonPrefix[index] = '\0';
+	return commonPrefix;
+
+}
+struct ListNode* reverseList(struct ListNode* head){
+	if (head == NULL) return NULL;
+	struct ListNode *current = head;
+	struct ListNode *pre = NULL;
+	for (struct ListNode *temp;
+			current != NULL; current = temp)
+	{
+		temp = current->next;
+		current->next = pre;
+		pre = current;
+	}
+	return pre;
+
+}
+struct ListNode* mergeTwoLists(struct ListNode* l1, struct ListNode* l2){
+	struct ListNode *head;
+	struct ListNode *temp;
+	struct ListNode *current = NULL;
+	struct ListNode *temp1 = l1;
+	struct ListNode *temp2 = l2;
+
+	while (temp1 != NULL && temp2 != NULL) {
+		if (temp1->val <= temp2->val) {
+			temp = temp1;
+			temp1 => temp1->next;
+		}
+		else {
+			temp = temp2;
+			temp2 = temp2->next;
+		}
+		if (current == NULL) {
+			current = head = temp;
+		}
+		else {
+			current->next = temp;
+			current = temp;
+		}
+	}
+	temp = temp1 != NULL ? temp1 : temp2;
+	while (temp != NULL) {
+		current->next = temp;
+	}
+	return head;
+
+}
 int main(void)
 {
 	//printf("%d", strStr("ah", "h"));
 	//printf("%s", genStr("111221"));
-	printf("%s", countAndSay(5));
+	char this[][4] = {
+		"ni",
+		"nih",
+		"niha"
+	};
+	printf("%s", longestCommonPrefix((char[][5]){
+				"nix",
+				"nih3",
+				"nih6",
+				"niw"
+				}, 4));
+
 	/** printf("%s", countAndSay(2)); */
 	/** printf("%s", countAndSay(3)); */
 	/** printf("%s", countAndSay(4)); */
