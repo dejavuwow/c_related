@@ -403,6 +403,108 @@ struct ListNode* mergeTwoLists(struct ListNode* l1, struct ListNode* l2){
 	return head;
 
 }
+bool isPalindrome = true;
+void checkEqual(struct ListNode **head, struct ListNode *tail) {
+	
+	if (tail->next == NULL) return;
+	checkEqual(head, tail->next);
+	*head = (*head)->next;
+	if ((*head)->val != tail->val) { isPalindrome = false;}
+
+}
+bool isPalindrome(struct ListNode* head){
+	checkEqual(&head, head);
+}
+struct ListNode* mergeTwoLists(struct ListNode* l1, struct ListNode* l2){
+	struct ListNode *temp;
+	if (l1 == NULL && l2 == NULL) return NULL;
+	else if (l1 == NULL) return l2;
+	else if (l2 == NULL) return l1;
+	else  {
+		if (l1->val > l2->val) {
+			temp = l2;
+			l2->next = mergeTwoLists(l2->next, l1);
+		}
+		else {
+			temp = l1
+			l1->next = mergeTwoLists(l1->next, l2);
+		}
+	}
+	return temp;
+}
+
+int maxDepth(struct TreeNode* root){
+	
+	if (root == NULL) return 0;
+	int leftHeight = maxDepth(root->left),
+		rightHeight = maxDepth(root->right);
+		
+	return (leftHeight < rightHeight ? rightHeight : leftHeight) + 1;
+	
+}
+//[120,70,140,50,100,130,160,20,55,75,110,119,135,150,200]
+//                        120
+//                    70       140
+//                  50 100  130   160
+//                20
+//[5,1,4,null,null,3,6]
+//                     5
+//                    1 4
+//						3 6		
+bool checked = true;
+// 2
+//1 3
+struct TreeNode *getMax(struct TreeNode *root) {
+	struct TreeNode *max = root;
+	while ((max = max->right) != NULL);
+	return max;
+}
+struct TreeNode *getMin(struct TreeNode *root) {
+	struct TreeNode *min = root;
+	while ((min = min->left) != NULL);
+	return max;
+}
+void check(struct TreeNode *root) {
+	if (root == NULL) return;
+	check(root->left);
+	check(root->right);
+	if ((root->left != NULL && getMax(root->left)->val >= root->val) ||
+		((root->right) != NULL && getMin(root->right)->val <= root->val))
+	{
+		checked = false;
+	}
+}
+bool treeValid(struct TreeNode *root) {
+	
+	while (stack.length != 0 || root != NULL) {
+		stack.push()
+	}
+}
+
+bool validBst(struct TreeNode *root) {
+	if (root == NULL) return true;
+	if (!validBst(root->left)) {
+		return false;
+	}
+	if (pre != NULL && root->val <= pre->val) returnse;
+	pre = root;
+	if (!validBst(root->right)) {
+		return false;
+	}
+	return true;
+}
+
+bool checkNodeValRange(struct TreeNode *root, int min, int max) {
+	if (root == NULL) return true;
+	if (root->val <= min || root->val >= max) return false;
+	return checkNodeValRange(root->left, min,  root->val) && checkNodeValRange(root->right, root->val, max);
+}
+bool isValidBST(struct TreeNode* root){
+	checked = true;
+	check(root);
+	return checked;
+
+}
 int main(void)
 {
 	//printf("%d", strStr("ah", "h"));

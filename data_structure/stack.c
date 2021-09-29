@@ -47,7 +47,7 @@ void *pop(struct Stack * const stackList) {
 	stackList->length--;
 	if (stackList->length == 0) stackList->bottom = NULL;
 	else stackList->top->next = NULL;
-	
+
 	return top;
 }
 Stack *newStack(void) {
@@ -73,21 +73,42 @@ void traversePreorder(TreeNode *root) {
 		if (((TreeNode*)(item->ele))->left) push(stackList, ((TreeNode*)(item->ele))->left);
 	}
 }
-/** void traverseInorder(TreeNode *root)  */
-	/** Stack *stackList = newStack(); */
-	/** StackEle *item; */
-	/** TreeNode *node; */
-	/**  */
-	/** while (!IS_EMPTY(stackList) || ) */
-	/** if (node == NULL) { */
-	/**     item = pop(stackList); */
-	/**     printf("%d ", item->ele->val); */
-	/** } */
-	/** if (node->right) push(stackList, node->right); */
-	/** if (node->left) push(stackList, node->left); */
-	/**  */
-/** } */
 
+void traversePostorder(TreeNode *root) {
+	Stack *stackList = newStack();
+	TreeNode *p = root;
+	while (p != NULL || !IS_EMPTY(stackList)) {
+		while (p != NULL) {
+			push(stackList, p);
+			p = p->left;
+		}
+		p = (TreeNode*)(((StackEle*)pop(stackList))->ele);
+		push(stackList, p);
+		p = p->right;
+		if (p == NULL) {
+			p = (TreeNode*)(((StackEle*)pop(stackList))->ele);
+			printf("%d ", p->val);
+			p = NULL;
+		} 
+	}
+}
+/** void traverseInorder(TreeNode *root)  */
+/** Stack *stackList = newStack(); */
+/** StackEle *item; */
+/** TreeNode *node; */
+/**  */
+/** while (!IS_EMPTY(stackList) || ) */
+/** if (node == NULL) { */
+/**     item = pop(stackList); */
+/**     printf("%d ", item->ele->val); */
+/** } */
+/** if (node->right) push(stackList, node->right); */
+/** if (node->left) push(stackList, node->left); */
+/**  */
+/** } */
+//				50
+//		43				70
+//	32		49		67		79
 
 void main(void) {
 	TreeNode *root;
@@ -101,7 +122,8 @@ void main(void) {
 	new->left = newTreeNode(67);
 	new->right = newTreeNode(79);
 
-	traversePreorder(root);
+	//traversePreorder(root);
+	traversePostorder(root);
 }
 
 
