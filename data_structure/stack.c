@@ -76,20 +76,30 @@ void traversePreorder(TreeNode *root) {
 
 void traversePostorder(TreeNode *root) {
 	Stack *stackList = newStack();
+	Stack *rightChecked = newStack();
 	TreeNode *p = root;
+	_Bool *checkRight;
+
 	while (p != NULL || !IS_EMPTY(stackList)) {
 		while (p != NULL) {
 			push(stackList, p);
+			checkRight = (_Bool*)malloc(sizeof(_Bool));
+			*checkRight = 0;
+			push(rightChecked, checkRight);
 			p = p->left;
 		}
-		p = (TreeNode*)(((StackEle*)pop(stackList))->ele);
-		push(stackList, p);
-		p = p->right;
-		if (p == NULL) {
+		if (*(checkRight  = (_Bool*)(((StackEle*)pop(rightChecked))->ele)) == 1) {
 			p = (TreeNode*)(((StackEle*)pop(stackList))->ele);
 			printf("%d ", p->val);
 			p = NULL;
-		} 
+		} else {
+			p = (TreeNode*)(((StackEle*)pop(stackList))->ele);
+			*checkRight = 1;
+			push(rightChecked, checkRight);
+			push(stackList, p);
+			p = p->right;
+		}
+
 	}
 }
 /** void traverseInorder(TreeNode *root)  */
