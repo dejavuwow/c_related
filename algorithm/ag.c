@@ -179,7 +179,7 @@ char * longestPalindrome(char * s){
 	}
 	int l, r;
 	for (int l = 0; l < len; l++) {
-		for (i = 2; (r = l + i - 1 ) < len; l++) {
+		for (int i = 2; (r = l + i - 1 ) < len; l++) {
 			if (s[l] == s[r]) {
 				if (i > 2) {
 					if (dp[l][r] = dp[l + 1][r - 1]) {
@@ -203,6 +203,9 @@ char * longestPalindrome(char * s){
 	}
 	return ret;
 }
+//1   5
+//2 4
+//3
 char * convert(char * s, int numRows){
     int len = strlen(s);
 
@@ -251,7 +254,14 @@ char * convert(char * s, int numRows){
 	ret[n] = '\0';
 	return ret;
 }
+//145
+//236
+double findMedianSortedArrays(int* nums1, int nums1Size, int* nums2, int nums2Size){
+
+}
 void main(void) {
+	int a = 2 || 3;
+	printf("%d", a);
 	/** int nums[] = { -1, 2, 1, -4}; */
 	/** threeSumClosest(nums, 4, 1); */
 	/** int size; */
