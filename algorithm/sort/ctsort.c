@@ -8,7 +8,8 @@ int ctsort(int array[], int size, int max)
 
 	for (i = 0; i < max; i++) counts[i] = 0;
 	for (j = 0; j < size; j++) counts[array[j]]++;
-	
+	// 10020002001001
+	// 11133335556667
 	for (i = 1; i < max; i++)
 		counts[i] = counts[i] + counts[i - 1];
 

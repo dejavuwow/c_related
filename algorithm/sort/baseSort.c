@@ -56,7 +56,7 @@ int radixsort(int array[], int size, int p, int k)
 }
 int main(void)
 {
-	int array[] = {23,19,150, 43, 7, 35};
+	int array[] = {23,19,150, 43, 7, 95};
 	int *tp = array;
 	radixsort(array, 6, 3, 10);
 	printf("%d %d\n", sizeof(array), sizeof(tp));
