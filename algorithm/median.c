@@ -229,10 +229,10 @@ void setDifferentChar(char *s, int index, int max) {
 	else {
 		s[index] = GEN_DIFF(s[index - 1]);
 		if (index < max) {
-            if (s[index] == s[index + 1])
-			s[index] = GEN_DIFF(s[index]);
+			if (s[index] == s[index + 1])
+				s[index] = GEN_DIFF(s[index]);
 		}
-        printf("%c \n", s[index]);
+		printf("%c \n", s[index]);
 	}
 }
 char * modifyString(char * s){
@@ -240,11 +240,11 @@ char * modifyString(char * s){
 	char *cpyStr = (char*)malloc(sizeof(char) * (len + 1));
 	strncpy(cpyStr, s, len);
 	for (int i = 0; i < len; i++) {
-        printf("%d \n", i);
-        if (cpyStr[i] == '?')
-		setDifferentChar(cpyStr, i, len - 1);
+		printf("%d \n", i);
+		if (cpyStr[i] == '?')
+			setDifferentChar(cpyStr, i, len - 1);
 	}
-    printf(".... ");
+	printf(".... ");
 	return cpyStr;
 
 }
@@ -260,20 +260,20 @@ int getNumberOneNums(char *s) {
 	return ret;
 }
 bool checkString(char * s){
-    int l = strlen(s);
-    int i = 0;
-    int count = 0;
-    char temp = s[0];
-    while (++i < l) {
+	int l = strlen(s);
+	int i = 0;
+	int count = 0;
+	char temp = s[0];
+	while (++i < l) {
 		printf("%d \n", i);
-        if (count >= 2) {
+		if (count >= 2) {
 			printf("%%%%");
 			return false;
 		} 
-        if (s[i] != s[i - 1]) count++;
-    }
-    if (count == 1 && s[0] == 'b') return false;
-    return true;
+		if (s[i] != s[i - 1]) count++;
+	}
+	if (count == 1 && s[0] == 'b') return false;
+	return true;
 }
 int numberOfBeams(char ** bank, int bankSize){
 	int pre = 0;
@@ -294,15 +294,15 @@ int numberOfBeams(char ** bank, int bankSize){
 // y -  x = {....};
 //
 /** bool asteroidsDestroyed(int mass, int* asteroids, int asteroidsSize){ */
-	/** int comp(const int *a, const int *b) { */
-	/**     return *a - *b; */
-	/** } */
-	/** qsort(asteroids, asteroidsSize, sizeof(int), &comp); */
-	/** for (int i = 0; i < asteroidsSize; i++) { */
-	/**     if (mass >= asteroids[i]) mass += asteroids[i]; */
-	/**     else return false; */
-	/** } */
-	/** return true; */
+/** int comp(const int *a, const int *b) { */
+/**     return *a - *b; */
+/** } */
+/** qsort(asteroids, asteroidsSize, sizeof(int), &comp); */
+/** for (int i = 0; i < asteroidsSize; i++) { */
+/**     if (mass >= asteroids[i]) mass += asteroids[i]; */
+/**     else return false; */
+/** } */
+/** return true; */
 /** } */
 //1111 1111
 //10000100
@@ -311,27 +311,152 @@ int numberOfBeams(char ** bank, int bankSize){
 //100000001
 #define NUMBER 17 //2的17次方大于10的5次方
 bool asteroidsDestroyed(int mass, int* asteroids, int asteroidsSize){
-    int min[NUMBER];
-    long long sum[NUMBER];
-    memset(min,-1,sizeof(int)*NUMBER);
-    memset(sum,0,sizeof(long long)*NUMBER);
-    for(int i=0;i<asteroidsSize;++i){
-        int temp=31-__builtin_clz(asteroids[i]); //asteroids[i]      0 - 16
-        //printf("number:%d,judge:%d\n",asteroids[i],temp);
-        if(min[temp]==-1 || min[temp]>asteroids[i]){
-            min[temp]=asteroids[i];
-        }
-        sum[temp]+=asteroids[i];
-    }
-    long long res=mass;
-    for(int i=0;i<NUMBER;++i){//
-        //printf("res:%d,min:%d\n",res,min[i]);
-        if(res<min[i]){
-            return false;
-        }
-        res+=sum[i];
-    }
-    return true;
+	int min[NUMBER];
+	long long sum[NUMBER];
+	memset(min,-1,sizeof(int)*NUMBER);
+	memset(sum,0,sizeof(long long)*NUMBER);
+	for(int i=0;i<asteroidsSize;++i){
+		int temp=31-__builtin_clz(asteroids[i]); //asteroids[i]      0 - 16
+		//printf("number:%d,judge:%d\n",asteroids[i],temp);
+		if(min[temp]==-1 || min[temp]>asteroids[i]){
+			min[temp]=asteroids[i];
+		}
+		sum[temp]+=asteroids[i];
+	}
+	long long res=mass;
+	for(int i=0;i<NUMBER;++i){//
+		//printf("res:%d,min:%d\n",res,min[i]);
+		if(res<min[i]){
+			return false;
+		}
+		res+=sum[i];
+	}
+	return true;
+}
+void setZeroes(int** matrix, int matrixSize, int* matrixColSize){
+
+	int m = 0,
+		n = 0;
+	for (int i = 0; i < matrixColSize[0]; i++) {
+		if (matrix[0][i] == 0) m = 1;
+	}
+	for (int i = 0; i < matrixSize; i++) {
+		if (matrix[i][0] == 0) n = 1;
+	}
+	for (int i = 1; i < matrixSize; i++) {
+		for (int j = 1; j < *matrixColSize; j++) {
+			if (maxtrix[i][j] == 0) {
+				matrix[0][j] = 0;
+				matrix[i][0] = 0;
+			}
+		}
+	}
+	for (int i = 1; i < matrixSize; i++) {
+		for (int j = 1; j < *matrixColSize; j++) {
+			if (maxtrix[0][j] == 0 || matrix[i][0] == 0) {
+				matrix[i][j] = 0;
+			}
+		}
+	}
+	if (m == 1) {
+		for (int i = 0; i < matrixColSize[0]; i++) {
+			matrix[0][i] = 0;
+		}
+	}
+	if (n == 1) {
+		for (int i = 0; i < matrixSize; i++) {
+			matrix[i][0] = 0;
+		}
+	}
+}
+int checkEqual(char *s1, char *s2) {
+	int ret = 0;
+	int i = 0;
+	int sum1 = 0;
+	int sum2 = 0;
+	for (; s1[i] != '\0' && s1[i] != '\0'; i++) {
+		sum1 += s1[i];
+		sum2 += s2[i];
+		ret ^= s1[i] ^ s2[i];
+	}
+	if (s1[i] == '\0' && s2[i] == '\0' && ret == 0 && sum1 == sum2) return 1;
+	return 0;
+}
+
+char *getKey(char *s1, char **strs, int strsSize) {
+	if (strsSize == 0) return NULL;
+	for (int i = 0; i < strsSize; i++) {
+		if (checkEqual(s1, strs[i])) {
+			return strs[i];
+		}
+	}
+	return NULL;
+}
+typedef struct my_struct {
+	char name[101];
+	char **list;
+	int len;
+	UT_hash_handle hh;         /* makes this structure hashable */
+} my_struct;
+
+struct my_struct *users = NULL;
+
+
+void delete_all() {
+	struct my_struct *current_user, *tmp;
+
+	HASH_ITER(hh, users, current_user, tmp) {
+		HASH_DEL(users, current_user);  /* delete it (users advances to next) */
+		free(current_user);             /* free it */
+	}
+}
+char *** groupAnagrams(char ** strs, int strsSize, int* returnSize, int** returnColumnSizes){
+	char ***ret = NULL;
+	char *p = NULL;
+	char **keyList = NULL;
+	int keyListLen = 0;
+	struct my_struct *s;
+	for (int i = 0; i < strsSize; i++) {
+		if ((p=getKey(strs[i], keyList, keyListLen)) == NULL) {
+
+			s = (struct my_struct*)malloc(sizeof(my_struct));
+			s->len = 0;
+			strcpy(s->name, strs[i]);
+			s->list = NULL;
+			HASH_ADD_STR(users, name, s);
+			keyList = (char**)realloc(keyList, (keyListLen + 1) * sizeof(char*));
+			keyList[keyListLen] = (char*)malloc(sizeof(char) * strlen(strs[i]) + 1);
+			strcpy(keyList[keyListLen], strs[i]);
+			keyListLen++;
+			p = strs[i];
+		}
+
+		HASH_FIND_STR(users, p, s);
+		s->list = (char**)realloc(s->list, (s->len + 1) * sizeof(char*));
+		s->list[s->len] = (char*)malloc(sizeof(char) * strlen(strs[i]) + 1);
+		strcpy(s->list[s->len], strs[i]);
+		s->len++;
+	}
+	*returnSize = 0;
+	*returnColumnSizes = NULL;
+    int k = 0;
+	for (s = users; s != NULL; s = s->hh.next, k++) {
+		*returnColumnSizes = (int*)realloc(*returnColumnSizes, sizeof(int) * (k + 1));
+		*returnColumnSizes[k] = s->len;
+		ret = (char***)realloc(ret, (*returnSize + 1) * sizeof(char**));
+		ret[*returnSize] = NULL;
+		ret[*returnSize] = (char**)realloc(ret[*returnSize], s->len * sizeof(char*));
+		int size = strlen(s->name);
+		for (int i = 0; i < s->len; i++) {
+			ret[*returnSize][i] = NULL;
+			ret[*returnSize][i] = (char*)realloc(ret[*returnSize][i], (size + 1) * sizeof(char));
+			strcpy(ret[*returnSize][i], s->list[i]);
+		}
+		*returnSize = *returnSize + 1;
+	}
+	delete_all();
+	return ret;
+
 }
 int main(void) {
 	/** int array1[2] = {1,3}; */
