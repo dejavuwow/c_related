@@ -1,3 +1,4 @@
+//node ../../../node_modules/.bin/husky add .husky/commit-msg 'npx --no -- commitlint --edit "$1"'
 typedef struct Node Node;
 #define MAX 2048
 #define log2(v) (log10(v) / log10(2))
@@ -52,6 +53,7 @@ int kthSmallest(struct TreeNode* root, int k){
 int is_new_island(char **grid, int i, int j) {
 	while
 }
+
 /** [1,1,1] */
 /** [1,1,0] */
 /** [1,0,1] */
@@ -63,6 +65,7 @@ int is_new_island(char **grid, int i, int j) {
 /** [0,0,0] */
 /** [0,1,1] */
 
+echo "#!/bin/sh\n\r . "$(dirname "$0")/_/husky.sh"\n\r npx --no-install commitlint --edit $1" > commitlint.config.js
 int numIslands(char** grid, int gridSize, int* gridColSize){
 	int t = 0;
 	for (int i = 0; i < gridSize; i++) {
@@ -152,4 +155,60 @@ int closedIsland(int** grid, int gridSize, int* gridColSize){
 		}
 	}
 	return count;
+}
+#define MEM_SET {\
+	for (int i = 0; i < heightsSize; i++) {\
+		for (int j = 0; j < heightsColSize[i]; j++) {\
+			map[i][j] = 0;\
+		}\
+	}\
+}
+void dfs(char **grid, int i, int j, int gridSize, int *gridColSize, int **map, int *pfind, int *afind) {
+	map[i][j] = 1;
+	if (i  == 0 || j == 0) {
+		*pfind = 1;
+	}
+	if (i == gridSize - 1 || j == gridColSize[i] - 1) {
+		*afind = 1;
+	}
+	if (i - 1 >= 0 && grid[i- 1][j] <= grid[i][j] && !map[i-1][j]) {
+		dfs(grid, i - 1, j, gridSize, gridColSize, map, pfind, afind);
+	}
+	if (j + 1 < gridColSize[i] && grid[i][j + 1] <= grid[i][j] && !map[i][j + 1]) {
+		dfs(grid, i, j + 1, gridSize, gridColSize, map, pfind, afind);
+	}
+	if (i + 1 < gridSize && grid[i+ 1][j] <= grid[i][j] && !map[i + 1][j]) {
+		dfs(grid, i + 1, j, gridSize, gridColSize, map, pfind, afind);
+	}
+	if (j - 1 >= 0 && grid[i][j - 1] <= grid[i][j] && !map[i][j-1]) {
+		dfs(grid, i , j - 1, gridSize, gridColSize, map, pfind, afind);
+	}
+}
+int** pacificAtlantic(int** heights, int heightsSize, int* heightsColSize, int* returnSize, int** returnColumnSizes){
+	int map[heightsSize][heightsColSize[0]];
+	int pfind;
+	int afind;
+	*returnSize = 0;
+	int *temp;
+	int **returnGrid = NULL;
+	*returnColumnSizes = NULL;
+
+	for (int i = 0; i < heightsSize; i++) {
+		for (int j = 0; j < heightsColSize[i]; j++) {
+			MEM_SET;
+			pfind = 0;
+			afind = 0;
+			dfs(heights, i, j, heightsSize, heightsColSize, map, &pfind, &afind);
+			if (pfind && afind) {
+				returnGrid = (int**)realloc(returnGrid, (*returnSize + 1) * sizeof(int*));
+				*returnColumnSizes = (int*)realloc(*returnColumnSizes, (*returnSize + 1) * sizeof(int));
+				(*returnColumnSizes)[*returnSize] = 2;
+				temp = (int*)malloc(sizeof(int) * 2);
+				temp[0] = i;
+				temp[1] = j;
+				returnGrid[*returnSize] = temp;
+			}
+		}
+	}
+	return returnGrid;
 }
