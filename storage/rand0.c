@@ -1,5 +1,6 @@
 #include <time.h>
 #include <stdio.h>
+extern int a;
 static unsigned long next = 1;
 static void srand(unsigned seed);
 unsigned int rand0(void)
