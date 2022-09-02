@@ -333,6 +333,45 @@ bool asteroidsDestroyed(int mass, int* asteroids, int asteroidsSize){
     }
     return true;
 }
+int maxSubArray(int* nums, int numsSize){
+	int sum = nums[0],
+		max = nums[0];
+	for (int i = 1; i < numsSize; i++) {
+		if (sum < nums[i]) {
+			printf("%d **\n", nums[i]);
+			sum = nums[i];
+		}
+		else {
+			printf("%d ##\n", nums[i]);
+			sum += nums[i];
+		}
+		max = max < sum ? sum : max;
+	}
+	return max;
+}
+// 111  000
+// 101	000
+// 111	000
+// 01 11 21
+// 10 11 12
+#define SET_ZERO_LINE(a, b) {\
+	printf("%d %d\n", a, b);\
+	for (int i = 0; i < matrixSize; i++) {\
+		matrix[i][b] = 0;\
+	}\
+	for (int i = 0; i < *matrixColSize; i++) {\
+		matrix[a][i] = 0;\
+	}\
+}
+void setZeroes(int** matrix, int matrixSize, int* matrixColSize){
+	for (int i = 0; i < matrixSize; i++) {
+		for (int j = 0; j < matrixColSize[i]; j ++) {
+			if (matrix[i][j] == 0) {
+				SET_ZERO_LINE(i, j);
+			}
+		}
+	}
+}
 int main(void) {
 	/** int array1[2] = {1,3}; */
 	/** int array2[] = {2}; */
@@ -342,7 +381,7 @@ int main(void) {
 	//printf("%d ", divide(-0x80000000, -1));
 	//printf("%s", modifyString("?th?is?"));
 	//printf("%d, ", checkString("aaba"));
-	printf("%d", __builtin_clz(0));
+	//printf("%d", __builtin_clz(0));
 	//1111 1111 1111
 	return 0;
 }
