@@ -193,14 +193,56 @@ int maxProfit(int* prices, int pricesSize){
 	}
 	return MAX(left[pricesSize - 1], max);
 }
-//buy[pricesSize][k] 表示当天结束后进行过k次交易，并且手上还有股票的最高利润
-//sell[pricesSize][k] 表示当天结束后进行过k次交易，并且手上没有股票的最高利润
-//
-//buy[m][n] = max(sell[m - 1][n] - prices[m], buy[m - 1][n])
-//sell[m][n] = max(buy[m - 1][n - 1] + prices[m], sell[m - 1][n])
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#define MAX(a, b) ((a) < (b) ? (b) : (a))
 int maxProfit(int k, int* prices, int pricesSize){
-	int m = MIN(pricesSize / 2, k) + 1;
-	int n = pricesSize + 1;
+    if (pricesSize == 0) return 0;
+	int n = MIN(pricesSize / 2, k) + 1;
+	int m = pricesSize;
+	int buy, sell;
+	
+	for (int j = 1; j < n; j++) {
+		buy = -prices[0];
+		sell = 0;
+		for (int i = 1; i < m; i++) {
+			buy = MAX(sell - prices[i], buy);
+			sell = MAX(buy[i - 1][j - 1] + prices[i], sell);
+		}
+	}
+	return sell;
+}
+int maxProfit(int k, int* prices, int pricesSize){
+    if (pricesSize == 0) return 0;
+	int n = MIN(pricesSize / 2, k) + 1;
+	int m = pricesSize;
+	int buy[m][n];
+	int sell[m][n];
+    int max = INT_MIN;
+    int maxBuy = INT_MIN;
+
+	for (int i = 0; i < n; i++) {
+		buy[0][i] = -prices[0];
+		sell[0][i] = 0;
+	}
+	for (int i = 0; i < m; i++) {
+		buy[i][0] = maxBuy = MAX(maxBuy, -prices[i]);
+		sell[i][0] = 0;
+	}
+	for (int j = 1; j < n; j++) {
+		for (int i = 1; i < m; i++) {
+			buy[i][j] = MAX(sell[i - 1][j] - prices[i], buy[i - 1][j]);
+			sell[i][j] = MAX(buy[i - 1][j - 1] + prices[i], sell[i - 1][j]);
+		}
+	}
+	return sell[m-1][n-1];
+}
+
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#define MAX(a, b) ((a) < (b) ? (b) : (a))
+int maxProfit(int k, int* prices, int pricesSize){
+    if (pricesSize == 0) return 0;
+	int n = MIN(pricesSize / 2, k) + 1;
+	int m = pricesSize;
 	int buy[m][n];
 	int sell[m][n];
 
@@ -208,9 +250,17 @@ int maxProfit(int k, int* prices, int pricesSize){
 		buy[0][i] = -prices[0];
 		sell[0][i] = 0;
 	}
-	for (int i = 1; i < pricesSize; i++) {
-
+	for (int i = 0; i < m; i++) {
+		buy[i][0] = -prices[i];
+		sell[i][0] = 0;
 	}
+	for (int i = 1; i < n; i++) {
+		for (int j = 1; j < m; j++) {
+			buy[j][i] = MAX(sell[j - 1][i] - prices[j], buy[j - 1][i]);
+			sell[j][i] = MAX(buy[j - 1][i - 1] + prices[j], sell[j - 1][i]);
+		}
+	}
+	return sell[m - 1][n - 1];
 }
-
-
+//buy[j-1][i-1] = sell[j - 2][i - 1] - prices[j - 1], buy[j - 2][i - 1]
+//sell[j][i] = sell[j- 1][i], sell[j - 2][i - 1], bu
