@@ -211,6 +211,35 @@ int maxProfit(int k, int* prices, int pricesSize){
 	}
 	return sell;
 }
+/** int maxProfit(int k, int* prices, int pricesSize){ */
+    /** if (pricesSize == 0) return 0; */
+	/** int n = MIN(pricesSize / 2, k) + 1; */
+	/** int m = pricesSize; */
+	/** int buy[m][n]; */
+	/** int sell[m][n]; */
+    /** int max = INT_MIN; */
+    /** int maxBuy = INT_MIN; */
+    /**  */
+	/** for (int i = 0; i < n; i++) { */
+	/**     buy[0][i] = -prices[0]; */
+	/**     sell[0][i] = 0; */
+	/** } */
+	/** for (int i = 0; i < m; i++) { */
+	/**     buy[i][0] = maxBuy = MAX(maxBuy, -prices[i]); */
+	/**     sell[i][0] = 0; */
+	/** } */
+	/** for (int j = 1; j < n; j++) { */
+	/**     for (int i = 1; i < m; i++) { */
+	/**         buy[i][j] = MAX(sell[i - 1][j] - prices[i], buy[i - 1][j]); */
+	/**         sell[i][j] = MAX(buy[i - 1][j - 1] + prices[i], sell[i - 1][j]); */
+	/**     } */
+	/** } */
+	/** return sell[m-1][n-1]; */
+/** } */
+//buy[i-1][j-1] = sell[i-2][j-1] - prices[i-1], buy[i-2][j-1]
+//
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#define MAX(a, b) ((a) < (b) ? (b) : (a))
 int maxProfit(int k, int* prices, int pricesSize){
     if (pricesSize == 0) return 0;
 	int n = MIN(pricesSize / 2, k) + 1;
@@ -228,39 +257,35 @@ int maxProfit(int k, int* prices, int pricesSize){
 		buy[i][0] = maxBuy = MAX(maxBuy, -prices[i]);
 		sell[i][0] = 0;
 	}
-	for (int j = 1; j < n; j++) {
-		for (int i = 1; i < m; i++) {
+	for (int i = 1; i < m; i++) {
+		for (int j = 1; j < n; j++) {
 			buy[i][j] = MAX(sell[i - 1][j] - prices[i], buy[i - 1][j]);
 			sell[i][j] = MAX(buy[i - 1][j - 1] + prices[i], sell[i - 1][j]);
 		}
 	}
 	return sell[m-1][n-1];
 }
-
-#define MIN(a, b) ((a) < (b) ? (a) : (b))
-#define MAX(a, b) ((a) < (b) ? (b) : (a))
-int maxProfit(int k, int* prices, int pricesSize){
-    if (pricesSize == 0) return 0;
-	int n = MIN(pricesSize / 2, k) + 1;
-	int m = pricesSize;
-	int buy[m][n];
-	int sell[m][n];
-
-	for (int i = 0; i < n; i++) {
-		buy[0][i] = -prices[0];
-		sell[0][i] = 0;
-	}
-	for (int i = 0; i < m; i++) {
-		buy[i][0] = -prices[i];
-		sell[i][0] = 0;
-	}
-	for (int i = 1; i < n; i++) {
-		for (int j = 1; j < m; j++) {
-			buy[j][i] = MAX(sell[j - 1][i] - prices[j], buy[j - 1][i]);
-			sell[j][i] = MAX(buy[j - 1][i - 1] + prices[j], sell[j - 1][i]);
-		}
-	}
-	return sell[m - 1][n - 1];
-}
-//buy[j-1][i-1] = sell[j - 2][i - 1] - prices[j - 1], buy[j - 2][i - 1]
-//sell[j][i] = sell[j- 1][i], sell[j - 2][i - 1], bu
+//buy[i][j-1] = sell[i-1][j-1] - prices[i], buy[i-1][j-1]
+//
+//sell[i][j - 1] = buy[i-1][j-2], sell[i-1][j-1]
+//sell[i][j] = buy[i-1][j-1] + prices[i], sell[i-1][j-1], sell[i-1][j]
+//
+//sell[i-1][j-1], sell[i-1][j], buy[i-1][j-1] + prices[i]
+//0 -1073741824 1     1
+//-1073741824 -1073741824 -1073741822 2
+//-1073741824 -1073741824 -1073741822 3
+//
+//0 1 3
+//1 -1073741822 -1073741820
+//-1073741822 -1073741822 -1073741820
+//
+//0 3 6
+//3 1 4
+//1 -1073741820 -1073741817
+//
+//0 6 2
+//6 4 0
+//4 1 -3
+//
+//0 6 4
+//6 6 8
