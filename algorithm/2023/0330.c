@@ -106,10 +106,41 @@ char ** wordBreak(char * s, char ** wordDict, int wordDictSize, int* returnSize)
 	
 }
 
+struct my_struct {
+	char word[31];
+	UT_hash_handle hh;         /* makes this structure hashable */
+};
+char str[31];
+int array[30];
+int array_len;
+struct my_struct *tmp, *other, *hash = NULL;
+bool dfs(char *word, int start) {
+	bool ret = false;
+	int l = strlen(word);
+	if (word[start] == '\0') {
+		return true;
+	}
+	for (int i = 0;i < array_len; i++) {
+		if (start + array[i] > l - 1) continue;
+		strncpy(str, word + start, array[i]);
+		str[array[i]] = '\0';
+		if (strcmp(str, word) == 0) continue;
+	
+		HASH_FIND_STR(hash, str, other);
+		if (other && dfs(word, start + array[i] + 1)) {
+			ret = true;
+		}
+	}
+	return ret;
+}
+//a ab
+//将单词长度记录
 char ** findAllConcatenatedWordsInADict(char ** words, int wordsSize, int* returnSize){
-	int arr[30];
+	char **ret = malloc(sizeof(char*) * wordsSize);
+	int l = 0;
 	int length[31];
-	int array_len = 0;
+	array_len = 0;
+	
 	memset(length, 0, sizeof(length));
 	for (int i = 0; i < wordsSize; i++) {
 		int l = strlen(words[i]);
@@ -117,6 +148,20 @@ char ** findAllConcatenatedWordsInADict(char ** words, int wordsSize, int* retur
 			length[l] = 1;
 			array[array_len++] = l;
 		}
+		HASH_FIND_STR(hash, words[i], tmp);
+		if (tmp == NULL) {
+			other = malloc(sizeof(struct my_struct));
+			strcpy(other->word, words[i]);
+			HASH_ADD_STR(hash, word, other);
+		}
 	}
-
+	for (int i = 0; i < wordsSize; i++) {
+		if (dfs(words[i], 0)) {
+			char *str = malloc(sizeof(char) * (strlen(words[i]) + 1));
+			strcpy(str, words[i]);
+			ret[l++] = str;
+		}
+	}
+	*returnSize = l;
+	return ret;
 }
