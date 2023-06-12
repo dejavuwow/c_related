@@ -13,10 +13,10 @@ bool dfs(char *s, int startIndex) {
 		strncpy(str, s + startIndex, array[i]);
 		str[array[i]] = '\0';
 		HASH_FIND_STR(hash, str, item);
-        if (!item) continue;
-        bool res = dfs(s, startIndex + array[i]);
-        if (res) return true;
-        else continue;
+		if (!item) continue;
+		bool res = dfs(s, startIndex + array[i]);
+		if (res) return true;
+		else continue;
 	}
 	return false;
 }
@@ -24,7 +24,7 @@ bool wordBreak(char * s, char ** wordDict, int wordDictSize){
 	hash = NULL;
 	char str[21];
 	int length[21];
-    array_len = 0;
+	array_len = 0;
 	memset(length, 0, sizeof(length));
 	for (int i = 0; i < wordDictSize; i++) {
 		int l = strlen(wordDict[i]);
@@ -39,7 +39,7 @@ bool wordBreak(char * s, char ** wordDict, int wordDictSize){
 			HASH_ADD_STR(hash, word, item);
 		}
 	}
-    return dfs(s, 0);
+	return dfs(s, 0);
 }
 //输入:s = "catsanddog", wordDict = ["cat","cats","and","sand","dog"]
 //输出:["cats and dog","cat sand dog"]
@@ -86,7 +86,7 @@ char ** wordBreak(char * s, char ** wordDict, int wordDictSize, int* returnSize)
 	hash = NULL;
 	char str[21];
 	int length[21];
-    array_len = 0;
+	array_len = 0;
 	memset(length, 0, sizeof(length));
 	for (int i = 0; i < wordDictSize; i++) {
 		int l = strlen(wordDict[i]);
@@ -103,7 +103,7 @@ char ** wordBreak(char * s, char ** wordDict, int wordDictSize, int* returnSize)
 	}
 	dfs(s, 0, 0, ret, returnSize);
 	return ret;
-	
+
 }
 
 struct my_struct {
@@ -125,7 +125,7 @@ bool dfs(char *word, int start) {
 		strncpy(str, word + start, array[i]);
 		str[array[i]] = '\0';
 		if (strcmp(str, word) == 0) continue;
-	
+
 		HASH_FIND_STR(hash, str, other);
 		if (other && dfs(word, start + array[i] + 1)) {
 			ret = true;
@@ -140,7 +140,7 @@ char ** findAllConcatenatedWordsInADict(char ** words, int wordsSize, int* retur
 	int l = 0;
 	int length[31];
 	array_len = 0;
-	
+
 	memset(length, 0, sizeof(length));
 	for (int i = 0; i < wordsSize; i++) {
 		int l = strlen(words[i]);
@@ -163,5 +163,101 @@ char ** findAllConcatenatedWordsInADict(char ** words, int wordsSize, int* retur
 		}
 	}
 	*returnSize = l;
+	return ret;
+}
+
+#define MAX 100000
+typedef struct {
+	int son[MAX][26];
+	int tail[MAX];
+	int count;
+} Trie;
+
+Trie* trieCreate() {
+	Trie * ret = malloc(sizeof(Trie));
+	ret->count = 0;
+	memset(ret->son, 0, sizeof(ret->son));
+	memset(ret->tail, 0, sizeof(ret->tail));
+	return ret;
+}
+
+void trieInsert(Trie* obj, char * word) {
+	int root = 0;
+	int l = strlen(word);
+	for (int i = 0; i < l; i++) {
+		int k = word[i] - 'a';
+		if (!obj->son[root][k]) {
+			obj->son[root][k] = ++obj->count;
+		}
+		root = obj->son[root][k];
+	}
+	obj->tail[root]++;
+}
+
+bool trieSearch(Trie* obj, char * word) {
+	int root = 0;
+	int l = strlen(word);
+	for (int i = 0; i < l; i++) {
+		int k = word[i] - 'a';
+		if (!obj->son[root][k]) return false;
+		root = obj->son[root][k];
+	}
+	return obj->tail[root];
+}
+
+bool trieStartsWith(Trie* obj, char * prefix) {
+	int root = 0;
+	int l = strlen(prefix);
+	for (int i = 0; i < l; i++) {
+		int k = prefix[i] - 'a';
+		if (!obj->son[root][k]) return false;
+		root = obj->son[root][k];
+	}
+	return true;
+}
+
+void trieFree(Trie* obj) {
+	free(obj);
+	obj = NULL;
+}
+int cmpFunc(const void *a, const void *b) {
+	return strlen(*(char**)a) - strlen(*(char**)b);
+}
+
+int search(Trie *dict, char *word, int start, int visited[30]) {
+	if (*(word + start) == '\0') return 1;
+	if (visited[start]) return 0;
+	for (int i = 0; *(word + start + i) != '\0'; i++) {
+		char temp = word[start + i + 1];
+		word[start + i + 1] = '\0';
+		int res = trieSearch(dict, word + start);
+		word[start + i + 1] = temp;
+		if (res && search(dict, word, start + i + 1)) {
+			return 1;
+		}
+	}
+	visited[start] = 1;
+	return 0;
+}
+
+char ** findAllConcatenatedWordsInADict(char ** words, int wordsSize, int* returnSize){
+	char **ret = malloc(sizeof(char*) * wordsSize);
+	char str[31];
+	int visited[30];
+	int size = 0;
+	qsort(words, wordsSize, sizeof(char*), cmpFunc);
+	Trie *dict = trieCreate();
+	for (int i = 0; i < wordsSize; i++) {
+		memset(visited, 0, sizof(visited));
+		if (search(dict, words[i], 0, visited)) {
+			char *str = malloc(sizeof(char) * (strlen(words[i]) + 1));
+			strcpy(str, words[i]);
+			ret[size++] = str;
+		} else {
+			trieInsert(dict, words[i]);
+		}
+	}
+	trieFree(dict);
+	*returnSize = size;
 	return ret;
 }
