@@ -24,29 +24,186 @@ int averageValue(int* nums, int numsSize){
 // 	}
 // 	return length;
 // }
+int find(int sum[], int l, int r, int target) {
+	if (sum[r] < target)  return -1;
+	while (l <= r) {
+		mid = (l + r) >> 1;
+		if (sum[mid] >= target) {
+			r = mid - 1;
+		}
+		else if (sum[mid] < target) {
+			l = mid + 1;
+		}
+	}
+	return l;
+}
 int minSubArrayLen(int target, int* nums, int numsSize){
-	int length = 0;
-	int dp[numsSize];
-	memset(dp, 0, sizeof(dp));
-	for (int i = numsSize - 1; i >= 0; i--) {
-		int last = length == 0 ? numsSize - 1 : i + length - 1;
-
-		if ((dp[numsSize -1] = dp[numsSize - 1] + nums[i]) < target) {
-			continue;
-		} 
-
-		if (length == 0 || numsSize - i < length) {
-			length = numsSize - i;
+	int length = INT_MAX;
+	int sum[numsSize + 1];
+	sum[0] = 0;
+	for (int i = 1; i <= numsSize; i++) {
+		sum[i] = sum[i - 1] + nums[i - 1];
+	}
+	for (int i = 1; i <= numsSize; i++) {
+		int t = target + sum[i - 1];
+		int res = find(sum, 1, numsSize, t);
+		if (res != -1) {
+			length = fmin(length, (res - i + 1));
 		}
-		for (int j = numsSize - 1; j >= i; j--) {
-			dp
+	}
+	return length == INT_MAX ? 0 : length;
+}
+
+int minSubArrayLen(int target, int* nums, int numsSize){
+	int length = INT_MAX;
+	int sums = 0;
+	int start = 0;
+
+	for (int i = 0; i < numsSize; i++) {
+		while (sums += nums[i] >= target) {
+			length = fmin(length, i - start + 1);
+			sums -= nums[start];
+			start++;
 		}
-		for (int j = i; j <= last; j++) {
-			dp[j] = dp[j] + nums[i];
-			if (dp[j] >= target && ( length == 0 || j - i + 1 < length)) {
-				length = j - i + 1;
+	}
+
+	return length == INT_MAX ? 0 : length;
+}
+//求出 差值 数组
+//
+//reward1 = [3,3,1,1] k = 2
+//reward2 = [4,4,3,3]
+// 1 1 2 2
+int cmp(const int *a, const int *b) {
+	return *b - *a;
+}
+int miceAndCheese(int* reward1, int reward1Size, int* reward2, int reward2Size, int k){
+	int diff[reward1Size];
+	int maxSum = 0;
+	int r1 = k,
+		r2 = reward1Size - k;
+
+	for (int i = 0; i < reward1Size; i++) {
+		diff[i] = reward1[i] - reward2[i];
+		maxSum += fmax(reward1[i], reward2[i]);
+	}
+	qsort(diff, reward1Size, sizeof(int), cmp)
+		for (int i = 0; i < reward1Size; i++) {
+			if (diff[i] > 0) {
+				if (r1 > 0){
+					r1--;
+				} 
+				else {
+					maxSum -= fabs(diff[i]);
+					r2--;
+				}
+			}
+			else {
+				if (r2 > 0) {
+					r2--;
+				} else {
+					maxSum -= fabs(diff[i]);
+					r1--;
+				}
+			}
+		}
+	return maxSum;
+}
+//1,0,2,0,0,6,7,0,8,6
+//1, 4, 0, 2,0,0
+int* applyOperations(int* nums, int numsSize, int* returnSize){
+	for (int i = 0, last = -1; i < numsSize - 1;) {
+		if (nums[i] == nums[i + 1]) {
+			nums[i] = 2 * nums[i];
+			nums[i + 1] = 0;
+			if (nums[i] != 0) {
+				int temp = nums[i];
+				nums[i] = 0;
+				nums[last + 1] = temp; 
+				last++;
+			}
+			i += 2;
+		}
+		else {
+			if (nums[i] != 0) {
+				int temp = nums[i];
+				nums[i] = 0;
+				nums[last + 1] = temp; 
+				last++;
+			}
+
+			i++;
+		}
+	}
+	*returnSize = numsSize;
+	return nums;
+}
+
+//[
+//[3,2,1],
+//[1,7,6],
+//[2,7,7]]
+//
+3 3
+3 2
+2 1
+1 2
+1 3
+7 1
+6 2
+2 3
+7 1
+7 2
+//[[2,30,400],
+//[40,7,6],
+//[300,7,7]]
+int equal(int row, int col, int gridSize, int **grid) {
+	for (int i = 0; i < gridSize; i++) {
+		if (grid[row][i] != grid[i][col]) return 0;
+	}
+	return 1;
+}
+int equalPairs(int** grid, int gridSize, int* gridColSize){
+
+	int equalPairsCount = 0;
+	for (int i = 0; i < rowSize; i++) {
+		for (int j = 0; j < colSize; j++) {
+			if (equal(i, j, gridSize, grid)) equalPairsCount++;
+		}
+	}
+
+	return equalPairsCount;
+}
+int keys[128], rowSize, colSize;
+int directions = {
+	{0, 1},
+	{1, 0},
+	{0, -1},
+	{-1, 0}
+};
+bfs(char **grid, int row, int col) {
+	for (int i = 0; i < 4; i++) {
+		
+	}
+}
+int shortestPathAllKeys(char ** grid, int gridSize){
+
+	int start = {0, 0};
+	rowSize = gridSize;
+	colSize = strlen(grid[0]);
+
+	memset(keys, 0, sizeof(keys));
+
+	for (int i = 0; i < rowSize; i++) {
+		for (int j = 0; j < colSize; j++) {
+			if (grid[i][j] == '@') {
+				start[0] = i;
+				start[1] = j;
+			}
+			else if (grid[i][j] >= 'a' && grid[i][j] <= 'z') {
+				keys[grid[i][j]] = 1;
 			}
 		}
 	}
-	return length;
+
 }
