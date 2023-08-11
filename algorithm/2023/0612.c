@@ -174,36 +174,143 @@ int equalPairs(int** grid, int gridSize, int* gridColSize){
 
 	return equalPairsCount;
 }
-int keys[128], rowSize, colSize;
-int directions = {
+
+int rowSize, colSize;
+int directions[][2] = {
 	{0, 1},
 	{1, 0},
 	{0, -1},
 	{-1, 0}
 };
-bfs(char **grid, int row, int col) {
-	for (int i = 0; i < 4; i++) {
-		
+int getIndex(int array[], int size, int value) {
+	for (int i = 0; i < size; i++) {
+		if (array[i] == value) 
+			return i;
 	}
+	return -1;
 }
 int shortestPathAllKeys(char ** grid, int gridSize){
 
-	int start = {0, 0};
+	const int QUEUE_SIZE = 32;
+	int x, y;
 	rowSize = gridSize;
 	colSize = strlen(grid[0]);
+	int map[27] = {0};
+	int keySize = 0;
 
-	memset(keys, 0, sizeof(keys));
+	int step[rowSize][colSize][128];
+	int queue[QUEUE_SIZE][3];
+	int start = -1,
+	end = 0;
+
+	memset(keyStr, 0, 7);
 
 	for (int i = 0; i < rowSize; i++) {
 		for (int j = 0; j < colSize; j++) {
+			memset(step[i][j], -1, sizeof(step[i][j]));
 			if (grid[i][j] == '@') {
-				start[0] = i;
-				start[1] = j;
+				x = i;
+				y = j;
 			}
 			else if (grid[i][j] >= 'a' && grid[i][j] <= 'z') {
-				keys[grid[i][j]] = 1;
+				map[keySize++] = grid[i][j];
 			}
 		}
 	}
+	int *p = queue[end++ % QUEUE_SIZE];
+		
+	p[0] = x;
+	p[1] = y;
+	p[2] = 0;
+	
+	step[x][y][0] = 0;
 
+	while (start < end) {
+		p = queue[++start % QUEUE_SIZE];
+		int x = p[0],
+		y = p[1],
+		z = p[2];
+
+		for (int i = 0; i < 4; i++) {
+			int nx = x + directions[i][0],
+			ny = y + directions[i][1];
+			if (nx >= 0 && nx < rowSize && ny >= 0 && ny < colSize && grid[nx][ny] != '#') {
+				if (grid[nx][ny] == '.' || grid[nx][ny] == '@') {
+					if (step[nx][ny][z] == -1) {
+						step[nx][ny][z] = step[x][y][z] + 1;
+						p = queue[end++ % QUEUE_SIZE];
+						p[0] = nx;
+						p[1] = ny;
+						p[2] = z;
+					}
+				}
+				else if (grid[nx][ny] >= 'a' && grid[nx][ny] <= 'z') {
+					int idx = getIndex(map, keySize, grid[nx][ny]) + 1;
+					if (step[nx][ny][z | (1 << idx)] == -1) {
+						step[nx][ny][z | (1 << idx)] = step[x][y][z] + 1;
+						p = queue[end++ % QUEUE_SIZE];
+						p[0] = nx;
+						p[1] = ny;
+						p[2] = z | (1 << idx);
+						if ((z | (1 << idx)) == (1 << keySize) - 1) {
+							return step[nx][ny][z | (1 << idx)];
+						} 
+					}
+				}
+				else {
+					int relatedKey = grid[nx][ny] + 0x20;
+					int idx = getIndex(map, keySize, grid[nx][ny]) + 1;
+					if (step[nx][ny][z] == -1 && (z && 1 << idx) != 0) {
+						step[nx][ny][z] = step[x][y][z] + 1;
+						p = queue[end++ % QUEUE_SIZE];
+						p[0] = nx;
+						p[1] = ny;
+						p[2] = z;
+					}
+				}
+			}
+		}
+	}
+	return -1;
 }
+ #
+#@#    0 4
+ #
+
+ ##
+# @#   1 7
+ ##
+
+ ##
+#  #   2 9
+#@#    
+ #
+
+ ###
+#@  #   3 11
+ # #    
+  #
+
+  #
+ #@#
+#   #   4 12
+ # #    
+  #
+
+3  4
+5  8
+7  12
+15 * 4
+  #
+ # ##
+#   @#   5 15
+ # ##   
+  #
+
+    $
+   $#$
+  $# #$
+ $#   #$    
+  $# #$   
+   $#$
+    $

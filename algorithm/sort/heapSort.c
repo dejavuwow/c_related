@@ -20,6 +20,9 @@ void balNode(Heap *data, int index)
 	if (max != index) balNode(data, max);
 	return;
 }
+//     1
+//   2   3 
+//  4 
 void heapInit(Heap *data)
 {
 	int index = data->length / 2 - 1;
