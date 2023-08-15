@@ -418,6 +418,212 @@ int* inorderTraversal(struct TreeNode* root, int* returnSize) {
 		cur1 = cur1->right; //实际是移动到右边子节点或者返回到该节点的父节点
 	}
 }
+struct TreeNode *reverseNodeList(struct TreeNode *node) {
+	struct TreeNode *pre = NULL;
+	struct TreeNode *tmp;
+	for (struct TreeNode *cur = node; node != NULL;) {
+		tmp = node->right;
+		node->right = pre;
+		pre = node;
+		node = tmp;
+	}
+	return pre;
+}
+void output(struct TreeNode *node, int *ret, int *size) {
+	struct TreeNode *head = reverseNodeList(node);
+	for (struct TreeNode *cur = head; cur != NULL; cur = cur->right) {
+		ret[(*size)++] = cur;
+	}
+	reverseNodeList(head);
+}
+int* postorderTraversal(struct TreeNode* root, int* returnSize) {
+	int *ret = malloc(sizeof(int) * 100);
+	int size = 0;
+	struct TreeNode *cur1, *cur2;
+	cur1 = root;
+
+	while (cur1 != NULL) {
+		cur2 = cur1->left;
+		if (cur2 != NULL) {
+			while (cur2->right != cur1 && cur2->right != NULL) {
+				cur2 = cur2->right;
+			}
+			if (cur2->right == NULL) {
+				cur2->right = cur1;
+				cur1 = cur1->left;
+				continue;
+			}
+			else {
+				cur2->right = NULL;
+				output(cur1->left, ret, &size);
+			}
+		}
+		cur1 = cur1->right; //实际是移动到右边子节点或者返回到该节点的父节点
+	}
+	output(root, ret, &size);
+	*returnSize = size;
+	return ret;
+}
+
+//从中序和先序遍历数组中构建二叉树
+int idx;
+struct TreeNode *buildRoot(int *preorder, int *inorder, int left, int right) {
+	if (right < left) return NULL;
+	struct TreeNode *root = malloc(sizeof(struct TreeNode));
+	int pivot;
+	root->val = preorder[idx++];
+	for (int i = left; i <= right; i++) {
+		if (preorder[idx] == inorder[i]) {
+			pivot = i;
+			break;
+		}
+	}
+	root->left = buildRoot(preorder, inorder, left, pivot - 1);
+	root->right = buildRoot(preorder, inorder, pivot + 1, right);
+	return root;
+}
+struct TreeNode* buildTree(int* preorder, int preorderSize, int* inorder, int inorderSize){
+	idx = 0;
+	return buildRoot(preorder, inorder, 0, inorderSize - 1);
+
+}
+
+struct TreeNode *stack[3000];
+int top = -1;
+#define PUSH(node) {\
+	stack[++top] = node;\
+}
+#define POP() (stack[top--])
+#define IS_EMPTY (top <= -1)
+#define NEW_NODE(node, value) {\
+	node = malloc(sizeof(struct TreeNode));\
+	node->val = value;\
+	node->left = node->right = NULL;\
+}
+
+struct TreeNode* buildTree(int* preorder, int preorderSize, int* inorder, int inorderSize){
+	struct TreeNode *root, *pre;
+	int index = 0;
+	pre = NULL;
+	NEW_NODE(root, preorder[0]);
+	struct TreeNode *head = root;
+	PUSH(root);
+	for (int i = 1; i < preorderSize; i++) {
+		if (stack[top]->val != inorder[index]) {
+			NEW_NODE(root, preorder[i]);
+			stack[top]->left = root;
+			PUSH(root);
+		}
+		else {
+			while (stack[top] == inorder[index]) {
+				pre = POP();
+				index++;
+			}
+			NEW_NODE(root, preorder[i]);
+			pre->right = root;
+		}
+	}
+	return head;
+}
+
+//从中序和后序数组中构建二叉树
+int idx;
+struct TreeNode *buildRoot(int *postorder, int *inorder, int left, int right) {
+	if (right < left) return NULL;
+	struct TreeNode *root = malloc(sizeof(struct TreeNode));
+	int pivot;
+	root->val = postorder[idx--];
+	for (int i = left; i <= right; i++) {
+		if (root-> val == inorder[i]) {
+			pivot = i;
+			break;
+		}
+	}
+	root->right = buildRoot(postorder, inorder, pivot + 1, right);
+	root->left = buildRoot(postorder, inorder, left, pivot - 1);
+	return root;
+}
+struct TreeNode* buildTree(int* inorder, int inorderSize, int* postorder, int postorderSize){
+	idx = postorderSize - 1;
+	return buildRoot(postorder, inorder, 0, inorderSize - 1);
+}
+
+struct TreeNode *stack[3000];
+int top = -1;
+#define PUSH(node) {\
+	stack[++top] = node;\
+}
+#define POP() (stack[top--])
+#define IS_EMPTY (top <= -1)
+#define NEW_NODE(node, value) {\
+	node = malloc(sizeof(struct TreeNode));\
+	node->val = value;\
+	node->left = node->right = NULL;\
+}
+struct TreeNode* buildTree(int* inorder, int inorderSize, int* postorder, int postorderSize){
+	struct TreeNode *root, *pre;
+	int idx = inorderSize - 1;
+	NEW_NODE(root, postorder[postorderSize - 1]);
+	struct TreeNode *head = root;
+	PUSH(root);
+	for (int i = postorderSize - 2; i >= 0; i--) {
+		if (stack[top]->val != inorder[idx]) {
+			NEW_NODE(root, postorder[i]);
+			stack[top]->right = root;
+			PUSH(root);
+		}
+		else {
+			while (!IS_EMPTY && stack[top]->val == inorder[idx]) {
+				pre = POP();
+				idx--;
+			}
+			NEW_NODE(root, postorder[i]);
+			pre->left = root;
+			PUSH(root);
+		}
+	}
+	return head;
+}
+
+//从先序和后序遍历构建二叉树
+struct TreeNode *stack[30];
+int top = -1;
+#define PUSH(node) {\
+	stack[++top] = node;\
+}
+#define POP() (stack[top--])
+#define IS_EMPTY (top <= -1)
+#define NEW_NODE(node, value) {\
+	node = malloc(sizeof(struct TreeNode));\
+	node->val = value;\
+	node->left = node->right = NULL;\
+}
+struct TreeNode* constructFromPrePost(int* preorder, int preorderSize, int* postorder, int postorderSize){
+	struct TreeNode *root, *pre;
+	int map[31];
+	int idx = 0;
+	int cmpIdx = postorderSize - 1;
+	NEW_NODE(root, preorder[0]);
+	struct TreeNode *head = root;
+	PUSH(root);
+
+	for (int i = 0; i < postorderSize; i++) {
+		map[postorder[i]] = i;
+	}
+	for (int i = 1; i < preorderSize; i++) {
+		NEW_NODE(root, preorder[i]);
+		if (map[stack[top]->val] == idx) {
+			POP();
+			stack[top]->right = root;
+			idx++;
+		}
+		else {
+			stack[top]->left = root;
+		}
+		PUSH(root);
+	}
+	return head;
+}
 //      1
 //  2		3
 //4   5   6   7
