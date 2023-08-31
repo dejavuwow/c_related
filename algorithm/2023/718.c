@@ -613,9 +613,11 @@ struct TreeNode* constructFromPrePost(int* preorder, int preorderSize, int* post
 	for (int i = 1; i < preorderSize; i++) {
 		NEW_NODE(root, preorder[i]);
 		if (map[stack[top]->val] == idx) {
-			POP();
+			while(map[stack[top]->val] == idx) {
+				POP();
+				idx++;
+			}
 			stack[top]->right = root;
-			idx++;
 		}
 		else {
 			stack[top]->left = root;
@@ -623,6 +625,31 @@ struct TreeNode* constructFromPrePost(int* preorder, int preorderSize, int* post
 		PUSH(root);
 	}
 	return head;
+}
+//1245367
+//4526731
+struct TreeNode *buildTree(int *preorder, int l1, int r1, int *postorder, int l2, int r2) {
+	if (l1 > r1) return NULL;
+	struct TreeNode *root;
+	int k;
+	NEW_NODE(root, preorder[l1]);
+	if (l1 == r1) return root;
+	
+	for (int i = l2; i < r2; i++) {
+		if (preorder[l1 + 1] == postorder[i]) {
+				k = i;
+				break;
+		}
+	}
+	int length = k - l2 + 1;
+	root->left = buildTree(preorder, l1 + 1, l1 + length, postorder, l2, k - 1);
+	root->right = buildTree(preorder, l1 + length + 1, r1, postorder, k + 1, r2 - 1);
+
+	return root;
+}
+
+struct TreeNode* constructFromPrePost(int* preorder, int preorderSize, int* postorder, int postorderSize){
+	return buildTree(preorder, 0, preorderSize - 1, postorder, 0, postorderSize - 1);
 }
 //      1
 //  2		3
