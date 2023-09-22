@@ -185,7 +185,7 @@ int quickSelect(int *nums, int start, int end, int k) {
 	int base = nums[pivot];
 	SWAP(nums[pivot], nums[end]);
 	int left = start, 
-	int right = end;
+		int right = end;
 	while (left < right) {
 		while (nums[left] > base && left < right) left++;
 		while (nums[right] <= base && left < right) right--;
@@ -246,13 +246,13 @@ long long waysToBuyPensPencils(int total, int cost1, int cost2){
 	int min = fmin(cost1, cost2);
 	int n1 = total / max;
 	int n2 = total % max / min;
-    int pre = total % max % min;
+	int pre = total % max % min;
 	int dp = n2 + 1;
 	long long sum = dp;
-	
+
 	for (int i = n1 - 1; i >= 0; i--) {
-        int k = pre + max;
-        pre = k % min;
+		int k = pre + max;
+		pre = k % min;
 		dp = dp + k/min;
 		sum += dp;
 	}
@@ -321,29 +321,29 @@ char * findReplaceString(char * s, int* indices, int indicesSize, char ** source
 }
 
 void quickSort(int *number, int first, int last) {
-    int i, j, pivot;
-    int temp;
-    if (first<last) {
-        pivot = first;
-        i = first;
-        j = last;
-        while (i<j) {
-            while (number[i] <= number[pivot] && i<last)
-                i++;
-            while (number[j]>number[pivot])
-                j--;
-            if (i<j) {
-                temp = number[i];
-                number[i] = number[j];
-                number[j] = temp;
-            }
-        }
-        temp = number[pivot];
-        number[pivot] = number[j];
-        number[j] = temp;
-        quickSort(number, first, j - 1);
-        quickSort(number, j + 1, last);
-    }
+	int i, j, pivot;
+	int temp;
+	if (first<last) {
+		pivot = first;
+		i = first;
+		j = last;
+		while (i<j) {
+			while (number[i] <= number[pivot] && i<last)
+				i++;
+			while (number[j]>number[pivot])
+				j--;
+			if (i<j) {
+				temp = number[i];
+				number[i] = number[j];
+				number[j] = temp;
+			}
+		}
+		temp = number[pivot];
+		number[pivot] = number[j];
+		number[j] = temp;
+		quickSort(number, first, j - 1);
+		quickSort(number, j + 1, last);
+	}
 }
 //  1          7
 //2   3     8    9
@@ -390,7 +390,7 @@ int lengthOfLIS(int* nums, int numsSize){
 		if (dp[length] < nums[i]) {
 			dp[++length] = nums[i];
 		} else if (dp[length] > nums[i]) {
-			
+
 		}
 	}
 }
@@ -410,7 +410,7 @@ int dfs(int x, int a, int b, int step, int prem) {
 	}
 	return s1 || s2;
 }
-//f(x) = min(f(x - a), f(x + b)) + 1
+
 int minimumJumps(int* forbidden, int forbiddenSize, int a, int b, int x){
 	min = INT_MAX;
 	memset(map, 0, sizeof(map));
@@ -418,4 +418,32 @@ int minimumJumps(int* forbidden, int forbiddenSize, int a, int b, int x){
 		map[forbidden[i]] = 1;
 	}
 	return 	dfs(x, a, b, 0, 0) ? min : -1;
+}
+
+int map[2001];
+#define ENQUEUE(queue, value, step, forward) {\
+	int *temp = queue[++end % x];\
+	temp[0] = value;\
+	temp[2] = forward;\
+	temp[1] = step;\
+}
+#define DEQUEUE(queue) (queue[head++ % x])
+#define IS_EMPTY (head > end)
+int minimumJumps(int* forbidden, int forbiddenSize, int a, int b, int x){
+	memset(map, 0, sizeof(map));
+	int queue[x][3];
+	int head = 0;
+	int end = -1;
+	for (int i = 0; i < forbiddenSize; i++) {
+		map[forbidden[i]] = 1;
+	}
+	ENQUEUE(queue, a, 1);
+	while (!IS_EMPTY) {
+		int *t = DEQUEUE(queue);
+		if 
+		int f = t[0] + a;
+		if ()
+	}
+
+
 }
