@@ -173,7 +173,7 @@ void pop(KthLargest *obj) {
 	for (left = 1; left < obj->size;) {
 		right = left + 1 < obj->size ? left + 1 : left;
 		int lVal = obj->heap[left],
-			rVal = obj->heap[right];
+		rVal = obj->heap[right];
 		parent = pre;
 		obj->heap[parent] = lVal <= rVal ? lVal : rVal;
 		pre = lVal <= rVal ? left : right;
@@ -182,7 +182,7 @@ void pop(KthLargest *obj) {
 	parent = (left + 1 >> 1) - 1;
 	obj->heap[parent] = obj->heap[obj->size - 1];
 	while (parent >= 0) {
-		
+
 		int p = (parent + 1 >> 1) - 1;
 		if (obj->heap[parent] >= obj->heap[p]) break;
 		SWAP(obj->heap[parent], obj->heap[p]);
@@ -257,20 +257,287 @@ void kthLargestFree(KthLargest* obj) {
 //2134
 //1324
 //1243
+//3 + 2 +1  n ()
+// (n - 1) * (n - 1) / 2
 //123
+//12 (n)()
+// (n - 1) * 1
+//(4，5) = 3
+//(5,6) = ()
+//1234 5     3
+//          5
+//          6
+//          5
+//          k - q <= j
+//12
+//k - q <= j - 1
+//123
+// 
+//     1234
 //
+//  5 10 46
+//  59  46  45
+//  58  46    44
+//	57  46.... 43
+//	56  46 45 44 43 42
+//	55  45 44 43 42  41     i - (j - 1) - 1
+//  54  44 43 42 41 40
+//  53  43 42 41 40
+//  52  42 41 40
+//  51  41 40
+//  50  40
+//	
+//	46 33
+//	45 33 32
+//  44 33 32 31
+//  43 33 32 31 30
+//  42 32 31 30
+//
+//  21 10
+//  20 10
+//
+//  33 21
+//  32 21 20
+//  31 21 20
+//  
+//  33 21
+//  32 21 20
+//  31 21 20
+//  30 20
+//
+//  21 10
+//  20 10
 int kInversePairs(int n, int k){
 	int max = n *  (n - 1) / 2;
 	if (k > max) return 0;
 	else if (k == max) return 1;
- 	int dp[n + 1][k + 1];
+	int dp[n + 1][k + 1];
+	memset(dp, 0, sizeof(dp));
 	for (int i = 1; i <= n; i++) {
 		dp[i][0] = 1;
 	}
-	for (int i = 1; i < max; i++) {
-		for (int j = 1; j <= n; j++) {
-				for (int k =)
-			dp[j][k] =	dp[j - 1][k]
+	max = 0;
+	int bound = 0;
+	for (int j = 2; j <= n; j++) {
+		int preMax = max;
+		max += j - 1;
+		bound = fmin(max, k);
+		for (int i = 1; i <= bound; i++) {
+			dp[j][i] = dp[j][i - 1];
+			if (i <= preMax) {
+				dp[j][i] += dp[j - 1][i];
+			}
+			if (i > j - 1) {
+				dp[j][i] -= dp[j - 1][i - j];
+			}
 		}
 	}
+	return dp[n][k];
+}      *******
+//112 112
+//122 112
+//122 122 112 112 212 112 122
+// 5   4   5   5   **
+//pre count 0, pre char 1 
+// 2,
+// pre count 1, prechar 2
+//11
+//2
+int next() {
 }
+int magicalString(int n){
+	if (n < 3) return 1;
+	int size = n * 3 / 4;
+	int temp[size];
+	int index = 1;
+	int end = 1;
+	temp[0] = 1;
+	temp[1] = 2;
+	n -= 2;
+	int count = 1;
+	while (n--) {
+		++end;
+		if (temp[index] == 2) {
+			temp[end] = temp[end - 1];
+		} else {
+			temp[end] = temp[end - 1] == 1 ? 2 : 1;
+			++index;
+		}
+		if (temp[end] == 1) count++;
+	}
+	return count;
+}
+//f1(a) = n
+//f2(b) = m
+//f3(c) = k: f1(c) = j > n, f2(c) = p > m
+//2 4 6 
+//3 6 
+// 
+//2        21
+//3        14
+//3 6 9 12         f1(a) + f2(a) - f3(a)
+//6          42: 7
+// c = 
+// n * f (c) =  n (c / a + c / b - 1)
+// f1(c) + f2(c) - f3(c) = n;         
+// f1(c) / k + f2(c) k - = n / f3(c)                
+// c / a / (c / m)
+int gcd(int a, int b) {
+	return b == 0 ? a : gcd(b, a % b);
+}
+
+int lcm(int a, int b) {
+	int g = gcd(a, b);
+	return g == 1 ? a * b : fmax(a, b);
+}
+
+int search(int n, int low, int large, int c) {
+	int left = low;
+	int right = n * low;
+	int mid;
+	while (left <= right) {
+		mid = left + right >> 1;
+		int ilow = mid / low,
+			ilarge = mid / large,
+			ic = mid / c;
+		int res = ilow + ilarge - ic;
+		if (res == n) break;
+		else if (res > n) {
+			right = mid - 1;
+		} else {
+			left = mid + 1;
+		}
+	}
+	return mid % low > mid % large ? (mid / large * large) : (mid / low * low);
+}
+//n = m
+int nthMagicalNumber(int n, int a, int b){
+	int c = lcm(a, b);
+	int unit = c / a + c / b - 1;
+	int count = n / unit;
+	int rem = n - count * unit;
+
+	long long value = (long long)count * c;
+	for (int i = 1, j = 1; rem >= 0; rem--) {
+		if (i * a <= j * b) {
+			value += a;
+			i++;
+		} else {
+			value += b;
+			j++;
+		}
+	}
+	return value % (long long) % (1e9 + 7);
+}
+//9 8 2 3
+//7 6 2 3
+int nthMagicalNumber(int n, int a, int b){
+	int c = lcm(a, b);
+	int low = fmin(a, b);
+	int max = n * low;
+	int large = low == a ? b : a;
+	return search(n, low, large, c);
+}
+//基本思想：
+//令尽可能多的workers[i] >= tasks[i], 分配pills尽可能多的让原本 workers[i] < task[i] 变得 >=
+//贪心思想
+//1:
+//1: 搜索workers里的元素, 试图找出每一位workers[i] >= tasks[j] && 差值是最小的
+//2: 
+//a = b: left = b
+//a < b: left = b
+// 30 20  12  8  7  4
+//  22   9  6  5   3    n - 1    k   8 9                 
+//
+//  if (strength + k >= m && pills >) ？ cur
+// res = [workers[i]...];
+// max = res + min(pills, diffWorkers, diffTasks)
+//
+//t:[5,9,8,5,9] [19,19,8,5,5]
+//w:[1,6,4,2,6] [7,6,4,2,1]
+//5 5
+//97761
+//
+#define SIZE 50000
+typedef struct queue {
+	int head;
+	int end;
+	int raw[SIZE];
+} Queue;
+
+typedef struct stack {
+	int top;
+	int raw[SIZE];
+}
+//queue
+#define INIT_QUEUE(queue) {\
+	queue.head = 0;\
+	queue.end = -1;\
+}
+#define ENQUEUE(queue, node) (queue.raw[++queue.end % SIZE] = node)
+#define DEQUEUE(queue) (queue.raw[queue.head++ % SIZE])
+#define QUEUE_EMPTY(queue) (queue.head > queue.end)
+
+//stack
+#define INIT_STACK(stack) {\
+	stack.top = -1;\
+}
+#define PUSH(stack, node) (stack.raw[++stack.top] = node)
+#define POP(stack) (stack.raw[stack.top--])
+#define STACK_EMPTY(stack) (stack.top < 0)
+
+int cmp(int *a, int *b) {
+	return *a - *b;
+}
+int search(int *workers, int l, int r, int target) {
+	int left = l,
+		right = r;
+
+	while (left <= right) {
+		int mid = left + right >> 1;
+		if (workers[mid] > target) {
+			right = mid - 1;
+		} else {
+			left = mid + 1;
+		}
+	}
+	return left;
+}
+int maxTaskAssign(int* tasks, int tasksSize, int* workers, int workersSize, int pills, int strength){
+	int m = tasksSize,
+		n = workersSize;
+	qsort(tasks, m, sizeof(int), cmp);
+	qsort(workers, n, sizeof(int), cmp);
+	int max = fmin(m, n);
+	
+	int j = 0;
+	int min = n - max;
+	int j = max - 1;
+	int queue[SIZE];
+	Queue can;
+	Stack cant
+	INIT_QUEUE(can);
+	INIT_STACK(cant);
+	for (int i = max - 1; i >= 0; i--) {
+		int up = search(workers, min, j, tasks[j]);
+		if (up > j) {
+			if (pills > 0) {
+				if (STACK_EMPTY(cant)) {
+					int r = search(workers, min, j, tasks[j] - strength);
+
+				}
+			}
+		} else {
+			int maxWorkder = QUEUE_EMPTY(can) ? j + 1 : can.end;
+			for (int i = up; i < maxWorkder; i++) {
+				ENQUEUE(can, i);
+			}	
+			DEQUEUE(can);
+			j--;
+		}
+	}
+	return res;
+}
+//         12      		13 14 15 16
+//      34   35   36 	24
+//		56   46   45
