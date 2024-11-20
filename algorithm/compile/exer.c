@@ -104,25 +104,42 @@ int longestCommonSubsequence(char* text1, char* text2) {
 	return maxlength[l1 - 1];
 }
 
+
 int longestCommonSubsequence(char* text1, char* text2) {
     int m = strlen(text1), n = strlen(text2);
-    int dp[m + 1];
+    int dp[n + 1];
     memset(dp, 0, sizeof(dp));
     for (int i = 1; i <= m; i++) {
-
         char c1 = text1[i - 1];
-		int maxLenth = 0;
-
+		int pre = 0;
         for (int j = 1; j <= n; j++) {
-			
+
             char c2 = text2[j - 1];
-			int newLen = fmax(maxlength, dp[i])
+			int newLen = pre;
+			pre = dp[j];
 
             if (c1 == c2) {
-				dp[i] = dp[i]
+                dp[j] = pre + 1;
+            } else {
+				d[j] = fmax(d[j], d[j - 1]);
             }
-			maxlength = newLen;
         }
     }
-    return dp[m][n];
+    return dp[n];
 }
+//[a-zA-Z]
+//abcdef
+//a ab abc abcd abcde abcdef
+	b  bc bcd bcde bcdef				  
+// (s|S)(e|E)()
+// /a[a-z]*eiou/
+// /a*b*c*/
+// /*
+// ("*/")*
+// */  r -> [0-9]
+//(ab+a*)+ab+    ab+a+b(a*b)*
+//
+//(ab+a*)(ab+a*)*ab+
+//(ab+a*)ab+
+//(ab+a*)(ab+a*)+ab+
+//ab
