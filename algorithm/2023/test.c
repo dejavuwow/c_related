@@ -1,10 +1,14 @@
-#include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
+int main (void) {
 
-int main(void) {
-	char *s[18];
-	char *a = "123"; 
-	s[0] = a;
-	printf("%s\n%s", a, s[0]);
-	return 0;
-}
+    int b = 5;
+    int *a;
+	a[2] = 3;
+	printf("%p\n", a);
+    free(a);
+	printf("%p\n", a);
+    a = &b;
+	printf("%p", a);
+    return 0;
+}  

@@ -260,7 +260,7 @@ void dfs(int **grid, int x, int y, int sum) {
 		cy = y + directions[i][1];
 		if (cx >= 0 && cx < m && cy >= 0 && cy < n && grid[cx][cy] > 0) {
 			int temp = grid[cx][cy]
-			grid[cx][cy] = 0;
+				grid[cx][cy] = 0;
 			max = fmax(max, sum + grid[cx][cy]);
 			dfs(grid, cx, cy, sum + grid[cx][cy]);
 			grid[cx][cy] = temp;
@@ -284,29 +284,182 @@ int getMaximumGold(int** grid, int gridSize, int* gridColSize){
 	}
 	return max;
 }
-typedef struct {
 
+//链表实现 (时间复杂度不行)
+typedef struct LinkItem {
+	int value;
+	int snapId;
+	struct LinkItem *next;
+} LinkItem;
+typedef struct Item {
+	LinkItem *head;
+	LinkItem *end;
+} Item;
+
+typedef struct {
+	Item **snap;
+	int curId;
+	int length;
 } SnapshotArray;
 
 
 SnapshotArray* snapshotArrayCreate(int length) {
-
+	SnapshotArray *ret = malloc(sizeof(SnapshotArray));
+	ret->snap = malloc(sizeof(Item*) * length);
+	ret->length = length;
+	ret->curId = -1;
+	for (int i = 0; i < length; i++) {
+		ret->snap[i] = malloc(sizeof(Item));
+		LinkItem *cur = malloc(sizeof(LinkItem));
+		cur->value = 0;
+		cur->snapId = -1;
+		cur->next = NULL;
+		(ret->snap[i])->head = (ret->snap[i])->end = cur;
+	}
+	return ret;
 }
 
 void snapshotArraySet(SnapshotArray* obj, int index, int val) {
-
+	Item *item = obj->snap[index];
+	if (item->end && item->end->snapId == -1) {
+		item->end->value = val;
+	}
+	else {
+		LinkItem *cur = malloc(sizeof(LinkItem));
+		cur->value = val;
+		cur->snapId = -1;
+		cur->next = NULL;
+		if (!item->end) {
+			item->head = item->end = cur; 
+		} else {
+			if (val != item->end->value) {
+				item->end->next = cur;
+				item->end = cur;
+			}
+		}
+	}
 }
 
 int snapshotArraySnap(SnapshotArray* obj) {
-
+	for (int i = 0; i < obj->length; i++) {
+		if (obj->snap[i]->end) {
+			obj->snap[i]->end->snapId = obj->curId + 1;
+		}
+	}
+	return ++obj->curId;
 }
 
 int snapshotArrayGet(SnapshotArray* obj, int index, int snap_id) {
-
+	Item *item = obj->snap[index];
+	LinkItem *cur = item->head;
+	int pre = -1;
+	while (cur != NULL) {
+		if (snap_id > pre && snap_id <= cur->snapId) {
+			return cur->value;
+		}
+		pre = cur->snapId;
+		cur = cur->next;
+	}
+	return 0;
 }
 
 void snapshotArrayFree(SnapshotArray* obj) {
+	for (int i = 0; i < obj->length; i++) {
+		LinkItem *cur = obj->snap[i]->head;
+		for (; cur != NULL; ) {
+			LinkItem *pre = cur;
+			cur = cur->next;
+			free(pre);
+			pre = NULL;
+		}
+		(obj->snap[i])->head = NULL;
+		(obj->snap[i])->end = NULL;
+	}
+	obj->curId = -1;
+}
+#define EXTEND_SIZE 500
+//数组实现
+typedef struct {
+	int snapId;
+	int value;
+} Item;
+typedef struct {
+	Item **table;
+	int realLength;
+	int allLength;
+} ItemTable;
 
+typedef struct {
+	ItemTable *snap;
+	int curId;
+	int length;
+} SnapshotArray;
+
+
+SnapshotArray* snapshotArrayCreate(int length) {
+	SnapshotArray *ret = malloc(sizeof(SnapshotArray));
+	ret->snap = malloc(sizeof(ItemTable) * length);
+	ret->length = length;
+	ret->curId = -1;
+	for (int i = 0; i < length; i++) {
+		ItemTable talbe = ret->snap[i];
+		table.table = malloc(sizeof(Item*) * EXTEND_SIZE);
+		table.allLength = EXTEND_SIZE;
+		table.realLength = 1;
+		table.table[0] = malloc(sizeof(Item));
+		table.table[0]->snapId = -1;
+		table.table[0]->value = 0;
+	}
+	return ret;
+}
+
+void snapshotArraySet(SnapshotArray* obj, int index, int val) {
+	ItemTable table = obj->snap[index];
+	if (table.table[realLength - 1]->snapId == -1) {
+		table.table[realLength - 1]->value = val;
+	} else if (val != table.table[realLength - 1]->val) {
+		if (table.realLength >= table.allLength) {
+			table.table = realloc(table.table, table.allLength += EXTEND_SIZE);
+		}
+		table.table[realLength] = malloc(sizeof(Item));
+		table.table[realLength]->value = val;
+		table.table[realLength]->snapId = -1;
+		realLength++;
+	}
+}
+
+int snapshotArraySnap(SnapshotArray* obj) {
+	for (int i = 0; i < obj->length; i++) {
+		ItemTable table = obj->snap[i];
+		table.table[table.realLength - 1]->snapId = obj->curId + 1
+	}
+	return ++obj->curId;
+}
+int snapshotArrayGet(SnapshotArray* obj, int index, int snap_id) {
+	ItemTable table = obj->snap[index];
+	if (table.realLength == 1) return table.table[0]->val;
+	int ret;
+	for (int left = 0, right = table.realLength - 1; left <= right;) {
+		int mid = (left + right) >> 1;
+		if (table.table[mid]->snapId >= snap_id && table.table[mid - 1]->snapId < snap_id) {
+			ret = table.table[mid]->value;
+			break;
+		}
+	}
+	return ret;
+}
+
+void snapshotArrayFree(SnapshotArray* obj) {
+	for (int i = 0; i < obj->length; i++) {
+		ItemTable table = obj->snap[i];
+		table.table[0]->snapId = -1;
+		table.table[0]->value = 0;
+		for (int j = 1; j < talbe.realLength; j++) {
+			free(table.table[j]);
+		}
+		table.realLength = 1;
+	}
+	obj->curId = -1;
 }
 
 int cmp(int *a, int *b) {
