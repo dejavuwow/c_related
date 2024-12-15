@@ -308,3 +308,68 @@ int snapshotArrayGet(SnapshotArray* obj, int index, int snap_id) {
 void snapshotArrayFree(SnapshotArray* obj) {
 
 }
+
+int cmp(int *a, int *b) {
+	return *b - *a;
+}
+int search(int *task, int l, int r, int target) {
+	int left = l,
+		right = r;
+
+	while (left <= right) {
+		int mid = left + right >> 1;
+		if (task[mid] > target) {
+			left = mid + 1;
+		} else {
+			right = mid - 1;
+		}
+	}
+	return left;
+}
+int maxTaskAssign(int* tasks, int tasksSize, int* workers, int workersSize, int pills, int strength){
+	int m = tasksSize,
+		n = workersSize;
+	int map[m];
+	int size = n / 2 <= 0 ? 1 : n / 2;
+	int repeat[size];
+	int rpIndex = 0;
+	memset(map, 0, sizeof(map));
+	qsort(tasks, m, sizeof(int), cmp);
+	qsort(workers, n, sizeof(int), cmp);
+	int i, j;
+	int find = 0;
+	for (i = 0, j = 0; i < n && j < m; i++) {
+		int up = search(tasks, j, m - 1, workers[i]);
+		if (up >= m) {
+			break;
+
+		} else {
+			if (largest == -1) {
+				largest = up;
+			}
+			map[up] = i + 1;
+			j = up + 1;
+			find++;
+		}
+	}
+	if (find == m) return m;
+	int remainMax = fmin(m - find, fmin(n - i, pills));
+	int p, k;
+	int secondFind = 0;
+	for (k = 0, p = 0; k < remainMax; k++) {
+		int up = search(tasks, p, m - 1, workers[i + k] + strength);
+		if (up >= m) {
+			break;
+		} else {
+			p = up + 1;
+			secondFind++;
+		}
+	}
+	int findMin = fmax(secondFind, find);
+	int findMax = secondFind + find;
+	int taskEnd = fmax(j, p);
+	     
+
+	  
+	return find - (rpIndex - i);
+}
