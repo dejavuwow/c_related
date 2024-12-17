@@ -11,52 +11,30 @@
  *				 CL  RC
  **/             
 #define TEST_BOUNDARY(x, y) (!(x == 0 && y == currentM - 1) && x >= 0 && x < currentN && y >= 0 && y < currentM)
-#define TEST_PASSED(x, y) (grid[x][y] > 0 && grid[x][y] <= 90)
+#define TEST_COVERED(x, y) (grid[x][y] != 0)
 int **grid;
 int currentM, currentN;
 int count;
-int d[][2] = {
-	{1, 0},
-	{0, -1},
-	{-1, 0},
-	{0, 1}
-};
+/** int d[][2] = { */
+	/** {1, 0}, */
+	/** {0, -1}, */
+	/** {-1, 0}, */
+	/** {0, 1} */
+/** }; */
 int scheme[][2][2] = {
-	{{0, -1}, {1, 0}},
 	{{0, 1}, {1, 1}},
-	{{-1, -1}, {-1, 0}},
-
-	{{-1, 0}, {0, -1}},
-	{{1, 0}, {1, -1}},
-	{{-1, 1}, {0, 1}},
-
-	{{-1, 0}, {0, 1}},
-	{{1, 0}, {1, 1}},
-	{{-1, -1}, {0, -1}},
-
 	{{0, 1}, {1, 0}},
-	{{0, -1}, {1, -1}},
-	{{-1, 1}, {-1, 0}}
-
+	{{1, -1}, {1, 0}},
+	{{1, 0}, {1, 1}}
 };
 char word[][3] = {
-	{'C', 'R', 'U'},
 	{'R', 'C', 'U'},
-	{'U', 'R', 'C'},
-
-	{'C', 'D', 'R'},
-	{'D', 'C', 'R'},
-	{'R', 'D', 'C'},
-
-	{'C', 'D', 'L'},
-	{'D', 'C', 'L'},
-	{'L', 'D', 'C'},
-
 	{'C', 'L', 'U'},
-	{'L', 'C', 'U'},
-	{'U', 'L', 'C'}
+	{'D', 'R', 'C'},
+	{'D', 'C', 'L'}
 };
 int dfs(int x, int y) {
+
 	puts("==========================\n");
 	for (int i = 0; i < currentN; i++) {
 		for (int j = 0; j < currentM; j++) {
@@ -64,76 +42,38 @@ int dfs(int x, int y) {
 		}
 		puts("\n");
 	}
+	if (x == currentN - 1 && y >= currentM) return 1;
+	if ((x == 0 && y == currentM - 1) || (x > 0 && y == currentM)) {
+		x++;
+		y = 0;
+	}
+	if (grid[x][y] != 0) {
+		return dfs(x, y + 1);
+	}
 	for (int i = 0; i < 4; i++) {
-		int newX = x + d[i][0];
-		int newY = y + d[i][1];
-		/**  if (x == 1 && y == 3) { */
-		/**     printf("get"); */
-		/** } */
-		/** if (newX == 2 && newY == 3) { */
-		/**  */
-		/**     printf("%d %d %c\n ", x, y, grid[x][y]); */
-		/**  */
-		/** } */
-		if (!TEST_BOUNDARY(newX, newY) || TEST_PASSED(newX, newY)) {
+		int aX = x + scheme[i][0][0];
+		int aY = y + scheme[i][0][1];
+
+		int bX = x + scheme[i][1][0];
+		int bY = y + scheme[i][1][1];
+		if (x == 0 && y == 2) {
+			printf("(%d %d) (%d %d)\n", aX, aY, bX, bY);
+		}
+		
+		if (!TEST_BOUNDARY(aX, aY) || !TEST_BOUNDARY(bX, bY) || TEST_COVERED(aX, aY) || TEST_COVERED(bX, bY)) {
 			continue;
 		}
-		if (grid[newX][newY] > 90) {
-			grid[newX][newY] -= 32;
-			count++;
-			if (!dfs(newX, newY)) {
-				grid[newX][newY] += 32;
-				count--;
-				continue;
-			}
-			return 1;
-		}
-
-		for (int j = 0; j < 12; j++) {
-			int aX = newX + scheme[j][0][0];
-			int aY = newY + scheme[j][0][1];
-
-			int bX = newX + scheme[j][1][0];
-			int bY = newY + scheme[j][1][1];
-			//printf("\nother %d %d, %d %d\n", aX, aY, bX, bY);
-			if (!TEST_BOUNDARY(aX, aY) || !TEST_BOUNDARY(bX, bY) || grid[aX][aY] != 0 || grid[bX][bY] != 0) continue;
-			//printf("get %d %d %d %d\n", aX, aY, bX, bY);
-
-			grid[newX][newY] = word[j][0];
-			grid[aX][aY] = word[j][1] + 32;
-			grid[bX][bY] = word[j][2] + 32;
-			/** if (newX == 2 && newY == 2 && aX == 1 && aY == 1 && bX == 2 && bY == 1 && grid[newX][newY] == 'L' && grid[aX][aY] == 'd' && grid[bX][bY] == 'c') { */
-			/** for (int i = 0; i < n; i++) { */
-			/**     for (int j = 0; j < m; j++) { */
-			/**         printf("%c", grid[i][j]); */
-			/**     } */
-			/**     putchar('\n'); */
-			/** } */
-			/**  */
-			/**  */
-			/** } */
-			count++;
-			if (dfs(newX, newY)) {
-				return 1;
-			}
-			count--;
-
-			/**          if (newX == 2 && newY == 2 && aX == 1 && aY == 1 && bX == 2 && bY == 1 && grid[newX][newY] == 'L' && grid[aX][aY] == 'd' && grid[bX][bY] == 'c') { */
-			/** for (int i = 0; i < n; i++) { */
-			/**     for (int j = 0; j < m; j++) { */
-			/**         printf("%c", grid[i][j]); */
-			/**     } */
-			/**     putchar('\n'); */
-			/** } */
-			/**  */
-			/**  */
-			/** } */
-			grid[newX][newY] = 0;
+		grid[x][y] = word[i][0];
+		grid[aX][aY] = word[i][1];
+		grid[bX][bY] = word[i][2];
+		if (!dfs(x, y + 1)) {
+			grid[x][y] = 0;
 			grid[aX][aY] = 0;
 			grid[bX][bY] = 0;
-		}
+			continue;
+		} else return 1;
 	}
-	return count == currentM * currentN - 1 ? 1 : 0;
+	return 0;
 }
 int main(void) {
 	/** int x; */
@@ -157,7 +97,7 @@ int main(void) {
 		memset(grid[i], 0, sizeof(int) * m);
 	}
 	grid[0][m - 1] = '.';
-	if (dfs(0, m - 1)) {
+	if (dfs(0, 0)) {
 		puts("Yes");
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < m; j++) {
