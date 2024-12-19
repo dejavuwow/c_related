@@ -35,13 +35,13 @@ char word[][3] = {
 };
 int dfs(int x, int y) {
 
-	puts("==========================\n");
-	for (int i = 0; i < currentN; i++) {
-		for (int j = 0; j < currentM; j++) {
-			printf("%c%c ", x == i && y == j ? '#' : 0,  !grid[i][j] ? '*' : grid[i][j]);
-		}
-		puts("\n");
-	}
+   /**  puts("==========================\n"); */
+	/** for (int i = 0; i < currentN; i++) { */
+	/**     for (int j = 0; j < currentM; j++) { */
+	/**         printf("%c%c ", x == i && y == j ? '#' : 0,  !grid[i][j] ? '*' : grid[i][j]); */
+	/**     } */
+	/**     puts("\n"); */
+	/** } */
 	if (x == currentN - 1 && y >= currentM) return 1;
 	if ((x == 0 && y == currentM - 1) || (x > 0 && y == currentM)) {
 		x++;
@@ -56,9 +56,6 @@ int dfs(int x, int y) {
 
 		int bX = x + scheme[i][1][0];
 		int bY = y + scheme[i][1][1];
-		if (x == 0 && y == 2) {
-			printf("(%d %d) (%d %d)\n", aX, aY, bX, bY);
-		}
 		
 		if (!TEST_BOUNDARY(aX, aY) || !TEST_BOUNDARY(bX, bY) || TEST_COVERED(aX, aY) || TEST_COVERED(bX, bY)) {
 			continue;

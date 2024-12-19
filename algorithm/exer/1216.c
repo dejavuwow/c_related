@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -22,12 +23,14 @@ int scheme[][2][2] = {
 	{{1, 0}, {1, 1}}
 };
 char fiveSquare[][5] = {
-	{ 'R', 'C', 'C', 'L', '.' },
-	{ 'D', 'U', 'U', 'R', 'C' },
-	{ 'C', 'L', 'R', 'C', 'U' },
-	{ 'C', 'L', 'D', 'U', 'D' },
-	{ 'U', 'R', 'C', 'R', 'C' }
+	{ 'C', 'L', 'C', 'L', '.' },
+	{ 'U', 'D', 'U', 'R', 'C' },
+	{ 'R', 'C', 'R', 'C', 'U' },
+	{ 'D', 'R', 'C', 'U', 'D' },
+	{ 'C', 'L', 'U', 'R', 'C' }
 };
+#define LEFT_RIGHT_TRANSFORM(c) (c == 'L' ? 'R' : c == 'R' ? 'L' : c)
+#define UP_BOTTOM_TRANSFORM(c) (c == 'D' ? 'U' : c == 'U' ? 'D' : c)
 char rotate(char c) {
 	if (c == 'R') return 'D';
 	if (c == 'U') return 'R';
@@ -122,7 +125,7 @@ void chess(int x, int y, int n, int m, int holeX, int holeY) {
 			CHESS_SIX(x, y, n - 2, 0);
 		}
 	} else if (n == 5) {
-		char temp;
+		int temp;
 		if (holeX == x) {
 			if (holeY != y) {
 				temp = grid[x][y + m - 1];
@@ -133,13 +136,38 @@ void chess(int x, int y, int n, int m, int holeX, int holeY) {
 				}
 				grid[x][y + m - 1] = temp;
 			} else {
+				temp = grid[x][y];
+				for (int i = 0; i < n; i++) {
+					for (int j = 0; j < m; j++) {
+						grid[x + i][y + j] = LEFT_RIGHT_TRANSFORM(fiveSquare[i][m - j - 1]);
+					}
+				}
+				grid[x][y] = temp;
+			}
+		} else {
+			if (holeY != y) {
+				temp = grid[x + n - 1][y + m - 1];
+				for (int i = 0; i < n; i++) {
+					for (int j = 0; j < m; j++) {
+						grid[x + i][y + j] = UP_BOTTOM_TRANSFORM(fiveSquare[n - i - 1][j]);
+					}
+				}
+				grid[x + n - 1][y + m - 1] = temp;
 
+			} else {
+				temp = grid[x + n - 1][y];
+				for (int i = 0; i < n; i++) {
+					for (int j = 0; j < m; j++) {
+						grid[x + i][y + j] = LEFT_RIGHT_TRANSFORM(UP_BOTTOM_TRANSFORM(fiveSquare[n - i - 1][m - j -1]));
+					}
+				}
+				grid[x + n - 1][y + m - 1] = temp;
 			}
 		}
 
 	} else if (n % 3 == 1) {
 		if (holeX == x) {
-			if (holeY == Y) {
+			if (holeY == y) {
 				grid[x + 1][y + 2] = 'D';
 				grid[x + 2][y + 1] = 'R';
 				grid[x + 2][y + 2] = 'C';
@@ -157,7 +185,7 @@ void chess(int x, int y, int n, int m, int holeX, int holeY) {
 				chess(x + 2, y + 2, n - 2, m - 2, x + 2, y + 2);
 			}
 		} else {
-			if (holeY == Y) {
+			if (holeY == y) {
 				grid[x + 1][y + 1] = 'R';
 				grid[x + 1][y + 2] = 'C';
 				grid[x + 2][y + 2] = 'U';
@@ -175,6 +203,44 @@ void chess(int x, int y, int n, int m, int holeX, int holeY) {
 				chess(x + 2, y + 2, n - 2, m - 2, x + n - 1, y + m - 1);
 			}
 		}
+	} else if (n % 3 == 2) {
+		if (holeX == x) {
+			if (holeY == y) {
+				grid[x + 3][y + 4] = 'D';
+				grid[x + 4][y + 3] = 'R';
+				grid[x + 4][y + 4] = 'C';
+				chess(x, y, 4, 4, x, y);
+				chess(x, y + 4, 4, m - 4, x + 3, y + 4);
+				chess(x + 4, y, n - 4, 4, x + 4, y + 3);
+				chess(x + 4, y + 4, n - 4, m - 4, x + 4, y + 4);
+			} else {
+				grid[x + 3][y + 3] = 'D';
+				grid[x + 4][y + 3] = 'C';
+				grid[x + 4][y + 4] = 'L';
+				chess(x, y, 4, 4, x + 3, y + 3);
+				chess(x, y + 4, 4, m - 4, x, y + m - 1);
+				chess(x + 4, y, n - 4, 4, x + 4, y + 3);
+				chess(x + 4, y + 4, n - 4, m - 4, x + 4, y + 4);
+			}
+		} else {
+			if (holeY == y) {
+				grid[x + 3][y + 3] = 'R';
+				grid[x + 3][y + 4] = 'C';
+				grid[x + 4][y + 4] = 'U';
+				chess(x, y, 4, 4, x + 3, y + 3);
+				chess(x, y + 4, 4, m - 4, x + 3, y + 4);
+				chess(x + 4, y, n - 4, 4, x + n - 1, y);
+				chess(x + 4, y + 4, n - 4, m - 4, x + 4, y + 4);
+			} else {
+				grid[x + 3][y + 3] = 'C';
+				grid[x + 3][y + 4] = 'L';
+				grid[x + 4][y + 3] = 'U';
+				chess(x, y, 4, 4, x + 3, y + 3);
+				chess(x, y + 4, 4, m - 4, x + 3, y + 4);
+				chess(x + 4, y, n - 4, 4, x + 4, y + 3);
+				chess(x + 4, y + 4, n - 4, m - 4, x + n - 1, y + m - 1);
+			}
+		}
 	}
 }
 void solve() {
@@ -183,13 +249,9 @@ void solve() {
 	scanf("%d", &x);
 	int l = x;
 	int temp[l][2];
+	int m, n;
 	while(x) {
-		scanf("%d %d", &temp[l - x][0], &temp[l - x][1]);
-		x--;
-	}
-	for (int i = 0; i < l; i++) {
-		int n = currentN = temp[i][0];
-		int m = currentM = temp[i][1];
+		scanf("%d %d", &n, &m);
 		count = 0;
 		grid = malloc(sizeof(int*) * n);
 		for (int i = 0; i < n; i++) {
@@ -205,9 +267,9 @@ void solve() {
 			chess(0, 0, n, m, 0, m -1);
 			for (int i = 0; i < n; i++) {
 				for (int j = 0; j < m; j++) {
-					printf("%c ", grid[i][j]);
+					printf("%c", grid[i][j]);
 				}
-				puts("\n");
+				putchar('\n');
 			}
 		}
 		for (int i = 0; i < n; i++) {
@@ -216,12 +278,42 @@ void solve() {
 		}
 		free(grid);
 		grid = NULL;
+
+		x--;
 	}
+	/** for (int i = 0; i < l; i++) { */
+		/** int n = currentN = temp[i][0]; */
+		/** int m = currentM = temp[i][1]; */
+		/** count = 0; */
+		/** grid = malloc(sizeof(int*) * n); */
+		/** for (int i = 0; i < n; i++) { */
+		/**     grid[i] = (int*)malloc(sizeof(int) * m); */
+		/**     memset(grid[i], 0, sizeof(int) * m); */
+		/** } */
+		/** grid[0][m - 1] = '.'; */
+		/** if ((m * n - 1) % 3 != 0) { */
+		/**     puts("No"); */
+		/** } */
+		/** else { */
+		/**     puts("Yes"); */
+		/**     chess(0, 0, n, m, 0, m -1); */
+		/**     for (int i = 0; i < n; i++) { */
+		/**         for (int j = 0; j < m; j++) { */
+		/**             printf("%c", grid[i][j]); */
+		/**         } */
+		/**         putchar('\n'); */
+		/**     } */
+		/** } */
+		/** for (int i = 0; i < n; i++) { */
+		/**     free(grid[i]); */
+		/**     grid[i] = NULL; */
+		/** } */
+		/** free(grid); */
+		/** grid = NULL; */
+	/** } */
 }
 
 int main() {
 	solve();
 	return 0;
 }
-
-
