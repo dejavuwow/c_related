@@ -82,9 +82,9 @@ char word[][3] = {
 	{'D', 'R', 'C'},
 	{'D', 'C', 'L'}
 };
-void CHESS_SIX(int x, int y, int length1, int xEquql2) {
+void CHESS_SIX(int x, int y, int length1, int horizontal) {
 	int length = length1;
-	if (xEquql2) {
+	if (horizontal) {
 		while (length >= 3) {
 			grid[x][y] = 'D';
 			grid[x + 1][y] = 'C';
@@ -108,8 +108,12 @@ void CHESS_SIX(int x, int y, int length1, int xEquql2) {
 		}
 	}
 }
+// #D
+// RCL
+// 	U
 void chess(int x, int y, int n, int m, int holeX, int holeY) {
 	if (n == 2) {
+		grid[x + ]
 		if (holeY == y) {
 			if (holeX == x) {
 				grid[x][y + 1] = 'D';

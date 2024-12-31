@@ -34,6 +34,7 @@ char word[][3] = {
 	{'D', 'C', 'L'}
 };
 int dfs(int x, int y) {
+
    /**  puts("==========================\n"); */
 	/** for (int i = 0; i < currentN; i++) { */
 	/**     for (int j = 0; j < currentM; j++) { */
@@ -72,40 +73,51 @@ int dfs(int x, int y) {
 	return 0;
 }
 int main(void) {
-	int x;
-	scanf("%d", &x);
-	int l = x;
-	int temp[l][2];
-	while(x) {
-		scanf("%d %d", &temp[l - x][0], &temp[l - x][1]);
-		x--;
+	/** int x; */
+	/** scanf("%d", &x); */
+	/** int l = x; */
+	/** int temp[l][2]; */
+	/** while(x) { */
+	/**     scanf("%d %d", &temp[l - x][0], &temp[l - x][1]); */
+	/**     x--; */
+	/** } */
+	/** for (int i = 0; i < l; i++) { */
+	scanf("%d %d", &currentN, &currentM);
+	//int n = currentN = temp[i][0];
+	//int m = currentM = temp[i][1];
+	int n = currentN;
+	int m = currentM;
+	count = 0;
+	grid = malloc(sizeof(int*) * n);
+	for (int i = 0; i < n; i++) {
+		grid[i] = (int*)malloc(sizeof(int) * m);
+		memset(grid[i], 0, sizeof(int) * m);
 	}
 	grid[0][m - 1] = '.';
 	if (dfs(0, 0)) {
 		puts("Yes");
 		for (int i = 0; i < n; i++) {
-			grid[i] = (int*)malloc(sizeof(int) * m);
-			memset(grid[i], 0, sizeof(int) * m);
-		}
-		grid[0][m - 1] = '.';
-		if ((m * n - 1) % 3 != 0 || !dfs(0, m - 1)) {
-		    	puts("No");
-		} else {
-			puts("Yes");
-			for (int i = 0; i < n; i++) {
-				for (int j = 0; j < m; j++) {
-					printf("%c", grid[i][j]);
-				}
-				putchar('\n');
+			for (int j = 0; j < m; j++) {
+				printf("%c", grid[i][j]);
 			}
+			putchar('\n');
 		}
-		for (int i = 0; i < n; i++) {
-			free(grid[i]);
-			grid[i] = NULL;
-		}
-		free(grid);
-		grid = NULL;
-
+	} else {
+		/**  for (int i = 0; i < n; i++) { */
+		/** for (int j = 0; j < m; j++) { */
+		/**     printf("%c", grid[i][j]); */
+		/** } */
+		/** putchar('\n'); */
+		/** } */
+		puts("No");
 	}
+	for (int i = 0; i < n; i++) {
+		free(grid[i]);
+		grid[i] = NULL;
+	}
+	free(grid);
+	grid = NULL;
+
+	/** } */
 
 }
