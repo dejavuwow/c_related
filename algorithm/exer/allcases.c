@@ -52,14 +52,6 @@ int check(char **grid, int n, int m) {
 	return count == m * n - 1 && cCount == (m * n - 1) / 3;
 }
 char **grid;
-int currentM, currentN;
-int count;
-int scheme[][2][2] = {
-	{{0, 1}, {1, 1}},
-	{{0, 1}, {1, 0}},
-	{{1, -1}, {1, 0}},
-	{{1, 0}, {1, 1}}
-};
 char fiveSquare[][5] = {
 	{ 'C', 'L', 'C', 'L', '.' },
 	{ 'U', 'D', 'U', 'R', 'C' },
@@ -69,19 +61,31 @@ char fiveSquare[][5] = {
 };
 #define LEFT_RIGHT_TRANSFORM(c) (c == 'L' ? 'R' : c == 'R' ? 'L' : c)
 #define UP_BOTTOM_TRANSFORM(c) (c == 'D' ? 'U' : c == 'U' ? 'D' : c)
-char rotate(char c) {
-	if (c == 'R') return 'D';
-	if (c == 'U') return 'R';
-	if (c == 'L') return 'U';
-	if (c == 'D') return 'L';
-	return '.';
+#define CHESS_HOLE_SQUARE(x, y, holeX, holeY) {\
+	if (holeY == y) {\
+		if (holeX == x) {\
+			grid[x][y + 1] = 'D';\
+			grid[x + 1][y + 1] = 'C';\
+			grid[x + 1][y] = 'R';\
+		} else {\
+			grid[x][y] = 'R';\
+			grid[x][y + 1] = 'C';\
+			grid[x + 1][y + 1] = 'U';\
+		}\
+	}\
+	else {\
+		if (holeX == x) {\
+			grid[x][holeY - 1] = 'D';\
+			grid[x + 1][holeY - 1] = 'C';\
+			grid[x + 1][holeY] = 'L';\
+		} else {\
+			grid[x][holeY - 1] = 'C';\
+			grid[x][holeY] = 'L';\
+			grid[x + 1][holeY - 1] = 'U';\
+		}\
+	}\
 }
-char word[][3] = {
-	{'R', 'C', 'U'},
-	{'C', 'L', 'U'},
-	{'D', 'R', 'C'},
-	{'D', 'C', 'L'}
-};
+
 void CHESS_SIX(int x, int y, int length1, int xEquql2) {
 	int length = length1;
 	if (xEquql2) {
@@ -108,190 +112,47 @@ void CHESS_SIX(int x, int y, int length1, int xEquql2) {
 		}
 	}
 }
+
 void chess(int x, int y, int n, int m, int holeX, int holeY) {
 	if (n == 2) {
-		if (holeY == y) {
-			if (holeX == x) {
-				grid[x][y + 1] = 'D';
-				grid[x + 1][y + 1] = 'C';
-				grid[x + 1][y] = 'R';
-			} else {
-
-				grid[x][y] = 'R';
-				grid[x][y + 1] = 'C';
-				grid[x + 1][y + 1] = 'U';
-			}
-			CHESS_SIX(x, y + 2, m - 2, 1);
-		}
-		else {
-			if (holeX == x) {
-				grid[x][y + m - 2] = 'D';
-				grid[x + 1][y + m - 2] = 'C';
-				grid[x + 1][y + m - 1] = 'L';
-			} else {
-				grid[x][y + m - 2] = 'C';
-				grid[x][y + m - 1] = 'L';
-				grid[x + 1][y + m - 2] = 'U';
-			}
-			CHESS_SIX(x, y, m - 2, 1);
-		}
+		CHESS_HOLE_SQUARE(x, y, holeX, holeY);
+		CHESS_SIX(x, holeY == y ? y + 2 : y, m - 2, 1);
 	} else if (m == 2) {
-
-		if (holeX == x) {
-			if (holeY == y) {
-				grid[x][y + 1] = 'D';
-				grid[x + 1][y + 1] = 'C';
-				grid[x + 1][y] = 'R';
-			} else {
-
-				grid[x][y] = 'D';
-				grid[x + 1][y] = 'C';
-				grid[x + 1][y + 1] = 'L';
-			}
-			CHESS_SIX(x + 2, y, n - 2, 0);
-		}
-		else {
-			if (holeY == y) {
-				grid[x + n - 2][y + 1] = 'D';
-				grid[x + n - 1][y] = 'R';
-				grid[x + n - 1][y + 1] = 'C';
-			} else {
-				grid[x + n - 2][y] = 'D';
-				grid[x + n - 1][y] = 'C';
-				grid[x + n - 1][y + 1] = 'L';
-			}
-			CHESS_SIX(x, y, n - 2, 0);
-		}
+		CHESS_HOLE_SQUARE(x, y, holeX, holeY);
+		CHESS_SIX(holeX == x ? x + 2 : x, y, n - 2, 0);
 	} else if (n == 5 || m == 5) {
 		if (n == 5 && m == 5) {
-			int temp;
-			if (holeX == x) {
-				if (holeY != y) {
-					temp = grid[x][y + m - 1];
-					for (int i = 0; i < n; i++) {
-						for (int j = 0; j < m; j++) {
-							grid[x + i][y + j] = fiveSquare[i][j];
-						}
-					}
-					grid[x][y + m - 1] = temp;
-				} else {
-					temp = grid[x][y];
-					for (int i = 0; i < n; i++) {
-						for (int j = 0; j < m; j++) {
-							grid[x + i][y + j] = LEFT_RIGHT_TRANSFORM(fiveSquare[i][m - j - 1]);
-						}
-					}
-					grid[x][y] = temp;
-				}
-			} else {
-				if (holeY != y) {
-					temp = grid[x + n - 1][y + m - 1];
-					for (int i = 0; i < n; i++) {
-						for (int j = 0; j < m; j++) {
-							grid[x + i][y + j] = UP_BOTTOM_TRANSFORM(fiveSquare[n - i - 1][j]);
-						}
-					}
-					grid[x + n - 1][y + m - 1] = temp;
-
-				} else {
-					temp = grid[x + n - 1][y];
-					for (int i = 0; i < n; i++) {
-						for (int j = 0; j < m; j++) {
-							grid[x + i][y + j] = LEFT_RIGHT_TRANSFORM(UP_BOTTOM_TRANSFORM(fiveSquare[n - i - 1][m - j -1]));
-						}
-					}
-					grid[x + n - 1][y + m - 1] = temp;
+			int temp = grid[holeX][holeY];
+			for (int i = 0; i < n; i++) {
+				for (int j = 0; j < m; j++) {
+					grid[x + i][y + j] = (holeX == x && holeY != y) ? fiveSquare[i][j] : holeX == x ? LEFT_RIGHT_TRANSFORM(fiveSquare[i][m - j - 1]) : (holeX != x && holeY != y) ? UP_BOTTOM_TRANSFORM(fiveSquare[n - i - 1][j]) : LEFT_RIGHT_TRANSFORM(UP_BOTTOM_TRANSFORM(fiveSquare[n - i - 1][m - j -1]));
 				}
 			}
+			grid[holeX][holeY] = temp;
 
 		} else {
 
 			if (n > 5) {
-				if (holeX == x) {
-					if (holeY == y) {
-						grid[x][y + 1] = 'D';
-						grid[x + 1][y] = 'R';
-						grid[x + 1][y + 1] = 'C';
-						CHESS_SIX(x, y + 2, m - 2, 1);
-					} else {
-						grid[x][y + m - 2] = 'D';
-						grid[x + 1][y + m - 2] = 'C';
-						grid[x + 1][y + m - 1] = 'L';
-						CHESS_SIX(x, y, m - 2, 1);
-					}
-					for (int i = n - 2; i >= 6; i -= 6) {
-						CHESS_SIX(x + 2, y, 3, 1);
-						CHESS_SIX(x + 4, y, 3, 1);
-						CHESS_SIX(x + 6, y, 3, 1);
-						CHESS_SIX(x + 2, y + 3, 6, 0);
-					}
-				}
-				else {
-					if (holeY == y) {
-						grid[x + n - 2][y] = 'R';
-						grid[x + n - 2][y + 1] = 'C';
-						grid[x + n - 1][y + 1] = 'U';
-						CHESS_SIX(x + n - 2, y + 2, m - 2, 1);
-					} else {
-						grid[x + n - 2][y + m - 2] = 'C';
-						grid[x + n - 2][y + m - 1] = 'L';
-						grid[x + n - 1][y + m - 2] = 'U';
-						CHESS_SIX(x + n - 2, y, m - 2, 1);
-					}
-					for (int i = n - 2; i >= 6; i -= 6) {
-						CHESS_SIX(x, y, 3, 1);
-						CHESS_SIX(x + 2, y, 3, 1);
-						CHESS_SIX(x + 4, y, 3, 1);
-						CHESS_SIX(x, y + 3, 6, 0);
-					}
+				int carry = n % 6;
+				int newX = holeX == x ? x : x + n - carry;
+				int value = holeX == x ? carry : 0;
+				chess(newX, y, carry, m, holeX, holeY);
+				for (int i = n - carry; i >= 6; i -= 6, x += 6) {
+					CHESS_SIX(x + value, y, 6, 0);
+					CHESS_SIX(x + value, y + 2, 3, 1);
+					CHESS_SIX(x + 2 + value, y + 2, 3, 1);
+					CHESS_SIX(x + 4 + value, y + 2, 3, 1);
 				}
 			} else {
-
-				if (holeY == y) {
-					if (holeX == x) {
-						grid[x][y + 1] = 'D';
-						grid[x + 1][y] = 'R';
-						grid[x + 1][y + 1] = 'C';
-						CHESS_SIX(x + 2, y, n - 2, 0);
-					} else {
-						grid[x + n - 2][y] = 'R';
-						grid[x + n - 2][y + 1] = 'C';
-						grid[x + n - 1][y + 1] = 'U';
-						CHESS_SIX(x, y, m - 2, 0);
-					}
-
-
-					for (int i = m - 2; i >= 6; i -= 6) {
-						CHESS_SIX(x + 2, y + 2, 3, 0);
-						CHESS_SIX(x + 2, y + 4, 3, 0);
-						CHESS_SIX(x + 2, y + 6, 3, 0);
-						CHESS_SIX(x, y + 2, 6, 1);
-					}
-				}
-				else {
-					if (holeX == x) {
-						grid[x][y + m - 2] = 'D';
-						grid[x + 1][y + m - 2] = 'C';
-						grid[x + 1][y + m - 1] = 'L';
-						CHESS_SIX(x + 2, y + m - 2, n - 2, 0);
-						/** for (int i = 0; i < 5; i++) { */
-						/** for (int j = 0; j < 8; j++) { */
-						/**     printf("%c ", grid[i][j]); */
-						/** } */
-						/** putchar('\n'); */
-						/** } */
-					} else {
-						grid[x + n - 2][y + m - 2] = 'C';
-						grid[x + n - 2][y + m - 1] = 'L';
-						grid[x + n - 1][y + m - 2] = 'U';
-						CHESS_SIX(x, y + m - 2, m - 2, 0);
-					}
-					for (int i = m - 2; i >= 6; i -= 6) {
-						CHESS_SIX(x + 2, y, 3, 0);
-						CHESS_SIX(x + 2, y + 2, 3, 0);
-						CHESS_SIX(x + 2, y + 4, 3, 0);
-						CHESS_SIX(x, y, 6, 1);
-					}
+				int carry = m % 6;
+				int newY = holeY == y ? y : y + m - carry;
+				int value = holeY == y ? carry : 0;
+				chess(x, newY, n, carry, holeX, holeY);
+				for (int i = m - carry; i >= 6; i -= 6, y += 6) {
+					CHESS_SIX(x, y + value, 6, 1);
+					CHESS_SIX(x + 2, y + value, 3, 0);
+					CHESS_SIX(x + 2, y + 2 + value, 3, 0);
+					CHESS_SIX(x + 2, y + 4 + value, 3, 0);
 				}
 			} 
 		} 
@@ -398,6 +259,9 @@ void solve() {
 						}
 						putchar('\n');
 					}
+					return;
+				} else {
+					printf("%d %d\n", n, m);
 				}
 
 			}
