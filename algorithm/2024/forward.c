@@ -50,8 +50,7 @@ NFA *getSingleNfa(int symbol) {
 //0->1->2   0->1->2
 NFA *concatNfa(NFA *nfa1, NFA *nfa2) {
 	int offset = nfa1->stateNum - 1;
-	nfa1->stateNum += offset;
-	
+	nfa1->stateNum += (nfa2->stateNum - 1);
 	for (int i = 0; i < nfa2->transNum; i++) {
 		int from = nfa2->start == nfa2->trans[i]->from ? nfa1->accept : nfa2->trans[i]->from + offset;
 
@@ -59,7 +58,7 @@ NFA *concatNfa(NFA *nfa1, NFA *nfa2) {
 		free(nfa2->trans[i]);
 		nfa2->trans[i] = NULL;
 	}
-	nfa1->accept = nfa2->accept + offset - 1;
+	nfa1->accept = nfa2->accept + offset;
 	free(nfa2);
 	return nfa1;
 }
@@ -101,7 +100,6 @@ NFA *buildNFA(char *regular) {
 	int hasAlternative = 0;
 	stack[++top] = getSingleNfa(EPSILON);
 	for (; *regular != '\0'; regular++) {
-		printf("%c ", *regular);
 		switch (*regular) {
 			case '(':
 				stack[++top] = getSingleNfa(EPSILON);
@@ -183,7 +181,6 @@ int *moveSet(NFA *nfa, int *set, int l, int c, int *res, int *resLength) {
 		int subRes[nfa->stateNum];
 		int n = 0;
 		move(nfa, set[i], c, subRes, &n);
-		printf("****%d\n", n);
 		for (int j = 0; j < n; j++) {
 			if (!includes(res, *resLength, subRes[j])) {
 				res[(*resLength)++] = subRes[j];
@@ -195,30 +192,62 @@ int *moveSet(NFA *nfa, int *set, int l, int c, int *res, int *resLength) {
 
 int match(NFA *nfa, char *s) {
 	int vol = nfa->stateNum;
-	printf("^^^^^^^^^^%d\n", vol);
 	int l = 0;
 	int set[vol];
 	int res[vol];
 	getEpsilonClosure(nfa, nfa->start, set, &l);
 	int resLength;
 	for (; *s != '\0'; s++) {
-		printf("%c \n", *s);
 		resLength = 0;
 		 moveSet(nfa, set, l, *s, res, &resLength);
-		 printf("%d\n", resLength);
 		 l = 0;
 		 for (int j = 0; j < resLength; j++) {
 			 set[l++] = res[j];
 		 }
 	}
-	printf("DDDDD");
 	while (resLength) {
 		if (set[--resLength] == nfa->accept) return 1;
 	}
 	return 0;
 }
-int main(void) {
-	NFA *nfa = buildNFA("ab*(abc|ab)aa*");
-	printf("%d***", match(nfa, "aabcaaaaa"));
+
+char *getMatchWord(NFA *nfa, char *s) {
+	int vol = nfa->stateNum;
+	int res[vol];
+	int set[vol];
+	int l = 0;
+	int resLength = 0;
+	getEpsilonClosure(nfa, nfa->start, set, &l);
+	while (!includes(set, l, nfa->accept) && *s != '\0') {
+		resLength = 0;
+		moveSet(nfa, set, l, *s, res, &resLength);
+		l = 0;
+		for (int j = 0; j < resLength; j++) {
+			set[l++] = res[j];
+		}
+		s++;
+	}
+	if (includes(set, l, nfa->accept)) {
+		return s;
+	}
+	return NULL;
+}
+
+	int main(void) {
+		NFA *nfa1 = buildNFA("IF");
+		NFA *nfa2 = buildNFA("cfkp");
+		
+		char s[] = "IFcfkik";
+		char *matchWord = getMatchWord(nfa1, s);
+		if (getMatchWord(nfa2, matchWord)) {
+			for (char *c = s; c != matchWord; c++) {
+				printf("%c", *c);
+			}
+		}
+
+	//NFA *nfa = buildNFA("ab*");
+   /**  for (int i = 0; i < nfa->transNum; i++) { */
+		/** printf("%d--%c-->%d\n", nfa->trans[i]->from, nfa->trans[i]->symbol == EPSILON ? 'e' : nfa->trans[i]->symbol, nfa->trans[i]->to); */
+	/** } */
 	return 0;
 }
