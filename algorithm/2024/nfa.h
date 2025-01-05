@@ -4,8 +4,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#define MAX_SIZE 101
-#define ALPHABET_SIZE 128
+#define MAX_SIZE 131
 #define EPSILON 0
 
 
@@ -13,19 +12,18 @@ typedef struct HashTable HashTable;
 
 typedef struct Node {
 	int value;
-	int edges[ALPHABET_SIZE];
-	int edgeLength;
 	HashTable adjTable;
 } Node;
 
-typedef struct NodeList {
-	int size;
-	Node *list[MAX_SIZE];
-} NodeList;
 
+typedef struct Link {
+	void *node;
+	void *next;
+} Link;
 
 struct HashTable {
-	NodeList *table[ALPHABET_SIZE];
+	Link *table[MAX_SIZE];
+	Link *next;
 	int size;
 };
 
@@ -33,56 +31,75 @@ struct HashTable {
 typedef struct NFA {
 	int acceptNum;
 	int stateNum;
-	int *stateList[MAX_SIZE];
 	Node *accept[MAX_SIZE];
-	Node *stateTable[MAX_SIZE];
+	HashTable stateTable;
 } NFA;
+#define LINK_ITER(head, temp) (temp = head, head = head ? head->next : NULL; temp != NULL; temp = head, head = head ? head->next : NULL)
+
+#define INIT_HASH_TABLE(table) {\
+	table.size = 0;\
+	table.next = NULL;\
+	for (int i = 0; i < MAX_SIZE; i++) {\
+		table.table[i] = NULL;\
+	}\
+}
+#define HASH_ITER(table, temp1, temp2, node) for (temp1 = table.next, temp2 = temp1 ? temp1->next : NULL, node = temp1 ? temp1->node : NULL; temp1 != NULL; temp1 = temp2, temp2 = temp1 ? temp1->next : NULL, node = temp1 ? temp1->node : NULL)
 
 #define INIT_NODE(value) ({\
 	Node *node = malloc(sizeof(node));\
 	node->value = value;\
-	node->edgeLength = 0;\
-	node->adjTable.size = 0;\
+	INIT_HASH_TABLE(node->adjTable);\
 	node;\
-})
-
-#define INIT_NODE_LIST() ({\
-	NodeList *list = malloc(sizeof(NodeList));\
-	list->size = 0;\
-	list;\
 })
 
 #define INIT_NFA() ({\
 	NFA *nfa = malloc(sizeof(NFA));\
 	nfa->stateNum = 0;\
 	nfa->acceptNum = 0;\
+	INIT_HASH_TABLE(nfa->stateTable);\
 	nfa;\
 })
 
-#define INSERT_NODE_LIST(list, node) {\
-	list->list[list->size++] = node;\
+#define INSERT_HASH_TABLE(table, k, node) {\
+	Link *next = table.next;\
+	table.table[k] = malloc(sizeof(Link));\
+	table.next = table[k];\
+	table[k]->next = next;\
+	table.table[k]->node = node;\
+	table.size++;\
 }
 
-#define INSERT_ADJTABLE(fromNode, c, toNode) {\
-	HashTable *adjTable = fromNode->adjTable;\
-	if (NULL == adjTable.table[c]) {\
-		adjTable.table[c] = INIT_NODE_LIST();\
-		fromNode->edges[fromNode->edgeLength++] = c;\
+#define GET_DATA(table, k) ((table).table[k] ? (table).table[k]->node : NULL)
+
+#define INSERT_ADJTABLE(fromNode, k, toNode) {\
+	HashTable table = (fromNode)->adjTable;\
+	Link *link = GET_DATA(table, k);\
+	if (NULL == link) {\
+		link = malloc(sizeof(Link));\
+		link->next = NULL;\
+		link->node = toNode;\
+		INSERT_HASH_TABLE(table, k, link)\
+	} else {\
+		link *next = link->next;\
+		link->next = malloc(sizeof(Link));\
+		link->next->node = toNode;\
+		link->next->next = next;\
 	}\
-	INSERT_NODE_LIST(adjTable.table[c], toNode);\
 }
 
 
 void addTran(NFA *nfa, int from, int to, int symbol) {
-	Node *fromNode = nfa->stateTable[from],
-		 *toNode = nfa->stateTable[to];
+	Node *fromNode = GET_DATA(nfa->stateTable, from),
+		 *toNode = GET_DATA(nfa->stateTable, to);
 	if (NULL == fromNode) {
 		fromNode = INIT_NODE(from);
-		nfa->stateList[nfa->stateNum++] = from;
+		INSERT_HASH_TABLE(nfa->stateTable, from, fromNode);
+		nfa->stateNum++;
 	}
 	if (NULL == toNode) {
 		toNode = INIT_NODE(to);
-		nfa->stateList[nfa->stateNum++] = to;
+		INSERT_HASH_TABLE(nfa->stateTable, to, toNode);
+		nfa->stateNum++;
 	}
 	INSERT_ADJTABLE(fromNode, symbol, toNode);
 }
@@ -90,22 +107,33 @@ void addTran(NFA *nfa, int from, int to, int symbol) {
 NFA *getSingleNfa(int symbol) {
 	NFA *nfa = INIT_NFA();
 	addTran(nfa, 0, 1, symbol);
-	nfa->accept[nfa->acceptNum++] = nfa->stateTable[1];
+	nfa->accept[nfa->acceptNum++] = GET_DATA(nfa->stateTable, 1);
 	return nfa;
 }
 
 void freeNfa(NFA *nfa) {
-	for (int p = 0; p < nfa->stateNum; p++) {
-		int i = nfa->stateList[p];
-		NodeList *list = nfa->stateTable[i]->adjTable.table;
-		for (int j = 0; j < nfa->stateTable[i]->edgeLength; j++) {
-			int k = nfa->stateTable[i]->edges[j];
-			free(list[k]);
-			list[k] = NULL;
+	Link *link1, *link2;
+	Node *node;
+	HASH_ITER(nfa.stateTable, link1, link2, node) {
+		Link *subLink1, *subLink2;
+		Node *subNode;
+		HASH_ITER(node.adjTable, subLink1, subLink2, subNode) {
+			Link *temp;
+			LINK_ITER(subNode, temp) {
+				temp->next = NULL;
+				temp->node = NULL;
+				free(temp);
+			}
+			subLink1->node = NULL;
+			subLink1->next = NULL;
+			free(subLink1);
 		}
-		free(nfa->stateTable[i]);
-		nfa->stateTable[i] = NULL;
+		free(node);
+		link1->next = NULL;
+		link1->node = NULL;
+		free(link1);
 	}
+	free(nfa)
 }
 
 NFA *concatNfa(NFA *nfa1, NFA *nfa2) {
@@ -113,7 +141,6 @@ NFA *concatNfa(NFA *nfa1, NFA *nfa2) {
 	NodeList *list = nfa2StartNode->adjTable.table;
 	int offset = nfa1->stateNum - 1;
 
-	//nfa1 accept gen nfa2 start trans
 
 	for (int i = 0; i < nfa2->stateNum; i++) {
 		int from = nfa2->stateList[i] == 0 ? nfa1->accept[0]->value : nfa2->stateList[i];
