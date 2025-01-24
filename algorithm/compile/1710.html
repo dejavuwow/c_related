@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+</head>
+
+<body>
+
+</body>
+
+</html>
+<script>
+	"use strict"
+
+	const nullStack = [];
+	const firstStack = [];
+	const lastStack = [];
+	const followMap = [];
+	const flagStack = [];
+	const integrateStack = [true];
+
+	function starProcess() {
+		nullStack.push(true);
+		lastStack[lastStack.length - 1].forEach(j => {
+			if (!followMap[j]) {
+				followMap[j] = [];
+			}
+			[].push.apply(followMap[j], firstStack[firstStack.length - 1] || []);
+		});
+	}
+	function alternateProcess() {
+		if (flagStack[flagStack.length - 1] == '|') {
+			let right = nullStack.pop();
+			let left = nullStack.pop();
+			nullStack.push(left || right);
+
+			right = firstStack.pop();
+			left = firstStack.pop();
+			firstStack.push(left.concat(right));
+
+			right = lastStack.pop();
+			left = lastStack.pop();
+			lastStack.push(left.concat(right));
+			flagStack.pop();
+		}
+		flagStack.push('|');
+		integrateStack.push(true);
+	}
+
+	function concateProcess() {
+		let right = nullStack.pop();
+		let left = nullStack.pop();
+		nullStack.push(left && right);
+
+		let rightFirst = firstStack.pop();
+		let leftFirst = firstStack.pop();
+		[].push.apply(firstStack, left ? leftFirst.concat(rightFirst) : leftFirst);
+
+		let rightLast = lastStack.pop();
+		let leftLast = lastStack.pop();
+		[].push.apply(lastStack, right ? leftLast.concat(rightLast) : rightLast);
+
+		leftLast.forEach(j => {
+			if (!followMap[j]) {
+				followMap[j] = [];
+			}
+			[].push.apply(followMap[j], rightFirst || []);
+		});
+
+	}
+
+	function parseExpr(str) {
+
+
+
+		for (let i = 0; i < str.length; i++) {
+			switch (str[i]) {
+				case '*':
+					starProcess();
+					break;
+				case '|':
+					if (flagStack[flagStack.length - 1] == '|') {
+						alternateProcess();
+					}
+					flagStack.push('|');
+					integrateStack.push(true);
+					break;
+
+				case '(':
+					flagStack.push('(');
+					integrateStack.push(true);
+					break;
+
+				case ')':
+					if (flagStack[flagStack.length - 1] == '|') {
+						alternateProcess();
+					}
+					flagStack.pop(); //弹出 (
+
+					if (str[i + 1] == '*') {
+						starProcess();
+					}
+					let right = nullStack.pop();
+					let left = nullStack.pop();
+					nullStack.push(left && right);
+
+					right = firstStack.pop();
+					left = firstStack.pop();
+					firstStack.push(left.concat(right));
+
+
+
+
+			}
+		}
+	}
+</script>

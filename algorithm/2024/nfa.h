@@ -44,7 +44,7 @@ typedef struct NFA {
 		__table__.table[i] = NULL;\
 	}\
 }
-#define HASH_ITER(table, temp1, temp2, __node__) for (temp1 = table.next, temp2 = temp1 ? temp1->next : NULL, __node__ = temp1 ? temp1->node : NULL; temp1 != NULL; temp1 = temp2, temp2 = temp1 ? temp1->next : NULL, __node__ = temp1 ? temp1->node : NULL)
+#define HASH_ITER(table, temp1, temp2, __node__) for (temp1 = (table).next, temp2 = temp1 ? temp1->next : NULL, __node__ = temp1 ? temp1->node : NULL; temp1 != NULL; temp1 = temp2, temp2 = temp1 ? temp1->next : NULL, __node__ = temp1 ? temp1->node : NULL)
 
 #define INIT_NODE(__value__) ({\
 	Node *node = malloc(sizeof(Node));\
@@ -146,11 +146,13 @@ void freeNfa(NFA *nfa) {
 			subLink1->next = NULL;
 			free(subLink1);
 		}
+		node->adjTable.next = NULL;
 		free(node);
 		link1->next = NULL;
 		link1->node = NULL;
 		free(link1);
 	}
+	nfa->stateTable.next = NULL;
 	free(nfa);
 }
 
@@ -161,10 +163,9 @@ NFA *concatNfa(NFA *nfa1, NFA *nfa2) {
 	Link *temp1, *temp2;
 	Node *node;
 
-
 	#define ADD_TRAN(from, to, key) {\
 		int f = from  == 0 ? nfa1AcceptNode->value : from + offset;\
-		addTran(nfa1, from, to + offset, key);\
+		addTran(nfa1, f, to + offset, key);\
 	}
 	TRANS_ITER(nfa2, ADD_TRAN);
 
@@ -206,42 +207,56 @@ NFA *addKleene(NFA *nfa) {
 	return  nfa;
 }
 
+#define CONCATE_ALTERNATIVE() {\
+	sTop--;\
+	n1 = stack[top--];\
+	n2 = stack[top--];\
+	n3 = top >= 0 && store[sTop] !='(' ? stack[top--] : NULL;\
+	n4 = addAlternative(n1, n2);\
+	stack[++top] = n3 ? concatNfa(n3, n4) : n4;\
+}
+
+//NFA *nfa1 = buildNFA("ab|cd|ab*(ab|cd)ce*");
 NFA *buildNFA(char *regular) {
 	NFA	*stack[100];
+	char store[100];
 	NFA *n1, *n2, *n3, *n4;
 	int top = -1;
-	int hasAlternative = 0;
+	int sTop = -1;
+	store[++sTop] = 0;
+
 	stack[++top] = getSingleNfa(EPSILON);
 	for (; *regular != '\0'; regular++) {
-		printf("%c \n", *regular);
 		switch (*regular) {
 			case '(':
+				store[++sTop] = '(';
 				stack[++top] = getSingleNfa(EPSILON);
 				break;
 			case ')':
-				if (hasAlternative) {
-					n1 = stack[top--];
-					n2 = stack[top--];
-					n3 = top >= 0 ? stack[top--] : NULL;
-					n4 = addAlternative(n1, n2);
-					stack[++top] = n3 ? concatNfa(n3, n4) : n4;
+				while (store[sTop] != '(') {
+					if (store[sTop] == '|') {
+						CONCATE_ALTERNATIVE();
+					}
 				}
-				hasAlternative = 0;
+				sTop--;
+				n1 = stack[top--];
+				if (*(regular + 1) == '*') {
+					n1 = addKleene(n1);
+					regular++;
+				}
+				n2 = stack[top--];
+				stack[++top] = concatNfa(n2, n1);
 				break;
-			case '*':
-				n1 = addKleene(stack[top--]);
-				n2 = top >= 0 ? stack[top--] : NULL;
-				stack[++top] = n2 ? concatNfa(n2, n1) : n1;
-				break;
+			/* case '*': */
+				/* n1 = addKleene(stack[top--]); */
+				/* n2 = top >= 0 ? stack[top--] : NULL; */
+				/* stack[++top] = n2 ? concatNfa(n2, n1) : n1; */
+				/* break; */
 			case '|':
-				if (hasAlternative) {
-					n1 = stack[top--];
-					n2 = stack[top--];
-					n3 = top >= 0 ? stack[top--] : NULL;
-					n4 = addAlternative(n1, n2);
-					stack[++top] = n3 ? concatNfa(n3, n4) : n4;
+				if (store[sTop] == '|') {
+					CONCATE_ALTERNATIVE();
 				}
-				hasAlternative = 1;
+				store[++sTop] = '|';
 				stack[++top] = getSingleNfa(EPSILON);
 				break;
 			default:
@@ -254,6 +269,14 @@ NFA *buildNFA(char *regular) {
 				stack[++top] = concatNfa(n1, n2);
 				break;
 		}
+	}
+	if (store[sTop] == '|') {
+		CONCATE_ALTERNATIVE();
+	}
+	while (top > 0) {
+		n1 = stack[top--];
+		n2 = stack[top--];
+		stack[++top] = concatNfa(n2, n1);
 	}
 	return stack[top];
 }
