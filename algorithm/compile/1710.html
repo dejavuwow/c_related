@@ -20,9 +20,11 @@
 	const lastStack = [];
 	const followMap = [];
 	const flagStack = [];
-	const integrateStack = [true];
+	const letterMap = {};
+	let integrate = true;
 
 	function starProcess() {
+		nullStack.pop();
 		nullStack.push(true);
 		lastStack[lastStack.length - 1].forEach(j => {
 			if (!followMap[j]) {
@@ -32,37 +34,36 @@
 		});
 	}
 	function alternateProcess() {
-		if (flagStack[flagStack.length - 1] == '|') {
-			let right = nullStack.pop();
-			let left = nullStack.pop();
-			nullStack.push(left || right);
+		let right = nullStack.pop();
+		let left = nullStack.pop();
+		nullStack.push(left || right);
 
-			right = firstStack.pop();
-			left = firstStack.pop();
-			firstStack.push(left.concat(right));
+		right = firstStack.pop();
+		left = firstStack.pop();
+		firstStack.push(left.concat(right));
 
-			right = lastStack.pop();
-			left = lastStack.pop();
-			lastStack.push(left.concat(right));
-			flagStack.pop();
-		}
-		flagStack.push('|');
-		integrateStack.push(true);
+		right = lastStack.pop();
+		left = lastStack.pop();
+		lastStack.push(left.concat(right));
+		flagStack.pop();
 	}
 
 	function concateProcess() {
+		if (nullStack.length < 2) return;
 		let right = nullStack.pop();
 		let left = nullStack.pop();
 		nullStack.push(left && right);
 
 		let rightFirst = firstStack.pop();
 		let leftFirst = firstStack.pop();
-		[].push.apply(firstStack, left ? leftFirst.concat(rightFirst) : leftFirst);
+
+		firstStack.push(left ? leftFirst.concat(rightFirst) : leftFirst);
 
 		let rightLast = lastStack.pop();
 		let leftLast = lastStack.pop();
-		[].push.apply(lastStack, right ? leftLast.concat(rightLast) : rightLast);
+		lastStack.push(right ? leftLast.concat(rightLast) : rightLast);
 
+		console.log("leftLast", leftLast)
 		leftLast.forEach(j => {
 			if (!followMap[j]) {
 				followMap[j] = [];
@@ -74,24 +75,20 @@
 
 	function parseExpr(str) {
 
+		for (let i = 0, k = 0; i < str.length; i++) {
 
-
-		for (let i = 0; i < str.length; i++) {
 			switch (str[i]) {
-				case '*':
-					starProcess();
-					break;
 				case '|':
 					if (flagStack[flagStack.length - 1] == '|') {
 						alternateProcess();
 					}
 					flagStack.push('|');
-					integrateStack.push(true);
+					integrate = true;
 					break;
 
 				case '(':
 					flagStack.push('(');
-					integrateStack.push(true);
+					integrate = true;
 					break;
 
 				case ')':
@@ -102,19 +99,70 @@
 
 					if (str[i + 1] == '*') {
 						starProcess();
+						i++;
 					}
-					let right = nullStack.pop();
-					let left = nullStack.pop();
-					nullStack.push(left && right);
+					if (!integrate) {
+						concateProcess();
+					}
+					integrate = false;
+					
+					break;
 
-					right = firstStack.pop();
-					left = firstStack.pop();
-					firstStack.push(left.concat(right));
+				default:
+					k++;
+					if (!letterMap[str[i]]) {
+						letterMap[str[i]] = [];
+					}
+					letterMap[str[i]].push(k);
 
-
-
-
+					nullStack.push(false);
+					firstStack.push([k]);
+					lastStack.push([k]);
+					if (str[i + 1] == '*') {
+						starProcess();
+						i++;
+					}
+					console.log(str[i]);
+					if (!integrate) {
+						concateProcess();
+					}
+					integrate = false;
+					break;
 			}
 		}
+
 	}
+
+	function buildDFA(str) {
+		parseExpr(str + '#');
+		const dfa = {};
+		const states = [firstStack.pop()]; 
+		dfa.start = [...states[0]];
+		const transTable = {};
+		for (let n = 0; n < states.length; n++) {
+			// return;
+			const list = states[n];
+			Object.keys(letterMap).forEach(i => {
+				let group = letterMap[i].filter(j => list.includes(j));
+				let resGroup = group.reduce((total, current) => {
+					return [...new Set(total.concat(followMap[current]))];
+				}, []);
+				console.log("-------");
+				console.log(group, resGroup)
+				if (states.every((t) => t.concat(resGroup).reduce((total, j) => {
+					return total ^ j;
+				}, 0) != 0)) {
+					states.push(resGroup);
+				}
+				if (!transTable[n]) {
+					transTable[n] = {};
+				}
+				transTable[n][i] = resGroup;
+			});
+		}
+		dfa.transTable = transTable;
+		dfa.accept = states.filter(i => i.includes(letterMap['#'][0]));
+		console.log(dfa)
+	}
+	buildDFA("(a|b)*abb");
 </script>
