@@ -7,7 +7,11 @@
 
 #define MAX_SIZE 100
 
-
+// a1 * 1 + a2 * n
+// b1 * 1 + b2 * n
+//a2 * n = b1
+//b2 * n = a1
+//
 void parseExpr(const char *str) {
 	int nullableStack[MAX_SIZE];
 	int nullTop = -1;

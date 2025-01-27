@@ -63,7 +63,6 @@
 		let leftLast = lastStack.pop();
 		lastStack.push(right ? leftLast.concat(rightLast) : rightLast);
 
-		console.log("leftLast", leftLast)
 		leftLast.forEach(j => {
 			if (!followMap[j]) {
 				followMap[j] = [];
@@ -122,7 +121,6 @@
 						starProcess();
 						i++;
 					}
-					console.log(str[i]);
 					if (!integrate) {
 						concateProcess();
 					}
@@ -132,7 +130,9 @@
 		}
 
 	}
-
+	function hash(array) {
+		return  
+	}
 	function buildDFA(str) {
 		parseExpr(str + '#');
 		const dfa = {};
@@ -147,8 +147,6 @@
 				let resGroup = group.reduce((total, current) => {
 					return [...new Set(total.concat(followMap[current]))];
 				}, []);
-				console.log("-------");
-				console.log(group, resGroup)
 				if (states.every((t) => t.concat(resGroup).reduce((total, j) => {
 					return total ^ j;
 				}, 0) != 0)) {
@@ -158,11 +156,20 @@
 					transTable[n] = {};
 				}
 				transTable[n][i] = resGroup;
+
 			});
 		}
+		dfa.symbols = Object.keys(letterMap);
+		dfa.states = states.map((i, k) => {
+			dfa.symbols.forEach(j => {
+				transTable[k][j] = states.indexOf(transTable[k][j]); 
+			})
+			return i;
+		});
 		dfa.transTable = transTable;
 		dfa.accept = states.filter(i => i.includes(letterMap['#'][0]));
-		console.log(dfa)
+		return dfa;
 	}
-	buildDFA("(a|b)*abb");
+	const dfa = buildDFA("(a|b)*abb");
+	console.log(dfa)
 </script>
