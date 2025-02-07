@@ -104,7 +104,7 @@
 						concateProcess();
 					}
 					integrate = false;
-					
+
 					break;
 
 				default:
@@ -130,20 +130,35 @@
 		}
 
 	}
+	const map = {};
+	let index = 0;
+
 	function hash(array) {
-		return  
+		const key = array.reduce((total, current) => {
+			return total + String(current) + ',';
+		}, '');
+		if (!map[key]) {
+			map[key] = ++index;
+		}
+		return map[key];
 	}
 	function buildDFA(str) {
 		parseExpr(str + '#');
 		const dfa = {};
-		const states = [firstStack.pop()]; 
-		dfa.start = [...states[0]];
+		const states = [firstStack.pop()];
 		const transTable = {};
 		for (let n = 0; n < states.length; n++) {
 			// return;
 			const list = states[n];
 			Object.keys(letterMap).forEach(i => {
 				let group = letterMap[i].filter(j => list.includes(j));
+				if (i == '#' && group.length) {
+					if (!dfa.accept) {
+						dfa.accept = [];
+					}
+					dfa.accept.push(...group);
+					return;
+				};
 				let resGroup = group.reduce((total, current) => {
 					return [...new Set(total.concat(followMap[current]))];
 				}, []);
@@ -152,24 +167,26 @@
 				}, 0) != 0)) {
 					states.push(resGroup);
 				}
-				if (!transTable[n]) {
-					transTable[n] = {};
+				if (resGroup.length == 0) return;
+				let key = hash(list);
+				if (!transTable[key]) {
+					transTable[key] = {};
 				}
-				transTable[n][i] = resGroup;
+				transTable[key][i] = hash(resGroup);
 
 			});
 		}
 		dfa.symbols = Object.keys(letterMap);
-		dfa.states = states.map((i, k) => {
-			dfa.symbols.forEach(j => {
-				transTable[k][j] = states.indexOf(transTable[k][j]); 
-			})
-			return i;
-		});
+		dfa.states = Object.values(map);
 		dfa.transTable = transTable;
-		dfa.accept = states.filter(i => i.includes(letterMap['#'][0]));
+		dfa.start = hash(states[0]);
+		dfa.accept = dfa.accept.reduce((total, current) => {
+			return [...new Set(Object.keys(map).filter(j => j.includes(String(current))).map(i => map[i]).concat(total))];
+		}, []);
+		dfa.accept.map(i => Object.keys(map).filter(j => j.includes(String(i))));
 		return dfa;
 	}
 	const dfa = buildDFA("(a|b)*abb");
 	console.log(dfa)
+	console.log(map)
 </script>
