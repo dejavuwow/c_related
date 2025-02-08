@@ -1,5 +1,10 @@
 //31 * (1 - 128)
 //6  33 1 13
+//A -> Ab | c
+//A -> cB
+//B -> bB | e
+//E -> TB
+//B -> +TB | e
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>

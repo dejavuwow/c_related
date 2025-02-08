@@ -137,10 +137,7 @@
 		const key = array.reduce((total, current) => {
 			return total + String(current) + ',';
 		}, '');
-		if (!map[key]) {
-			map[key] = ++index;
-		}
-		return map[key];
+		return map[key] || (map[key] = ++index);
 	}
 	function buildDFA(str) {
 		parseExpr(str + '#');
@@ -187,6 +184,54 @@
 		return dfa;
 	}
 	const dfa = buildDFA("(a|b)*abb");
-	console.log(dfa)
-	console.log(map)
+
+	function divideEqual(array1, array2) {
+		for (let i = 0; i < array1.length; i++) {
+			const index = array2.findIndex(j => j.includes(array1[i][0]));
+			if (!array2.every(j => j.every(k => array[i].includes(k)))) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	function statesMinimize(dfa) {
+		const nonAccept = dfa.states.filter(i => !dfa.accept.includes(i));
+		const symbols = dfa.symbols.slice(0, -1);
+		let divide = [
+			dfa.accept,
+			nonAccept
+		];
+		let newDivide = [
+			dfa.accept,
+			nonAccept
+		];
+		while (!divideEqual(devide, newDivide)) {
+			let group = [];
+			for (let i = 0; i < divide.length; i++) {
+				if (divide[i].length < 2) continue;
+
+				let state = divide[i][0];
+				const to = dfa.transTable[state][symbols[k]];
+				const index = divide.findIndex(i => i.includes(to));
+				group[index] = index;
+
+				for (let j = 1; j < divide[i].length; j++) {
+					for (let k = 0; k < symbols.length; k++) {
+						let state = divide[i][j];
+						const to = dfa.transTable[state][symbols[k]];
+						const index = divide.findIndex(i => i.includes(to));
+						const nIndex = newDivide.findIndex(i => i.includes(state));
+						newDivide[nIndex].splice(newDivide[nIndex].indexOf(state));
+						if (!group[index]) {
+							newDivide.push([state]);
+							group[index] = newDivide.length - 1;
+						} else {
+							newDivide[group[index]].push(state);
+						}
+					}
+				}
+			}
+		}
+	}
 </script>
