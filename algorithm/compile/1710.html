@@ -230,22 +230,26 @@
 						const index = divide.findIndex(i => i.includes(to));
 						const nIndex = newDivide.findIndex(i => i.includes(state));
 						newDivide[nIndex].splice(newDivide[nIndex].indexOf(state), 1);
-						if (!group[index]) {
+						if (group[index] === undefined) {
 							newDivide.push([state]);
 							group[index] = newDivide.length - 1;
 						} else {
 							newDivide[group[index]].push(state);
 						}
+						console.log("============");
 					}
 				}
 			}
+			console.log(JSON.stringify(newDivide))
 			if (divideEqual(divide, newDivide)) break;
 		}
 		dfa.start = newDivide.filter(i => dfa.start.some(j => i.includes(j))).map(i => i[0]);
 		dfa.accept = newDivide.filter(i => dfa.accept.some(j => i.includes(j))).map(i => i[0]);
-		const transTable = {}
+		const transTable = {};
+		const states = [];
 		newDivide.forEach(i => {
 			const from = i[0];
+			states.push(from);
 			symbols.forEach(j => {
 				const to = dfa.transTable[from][j];
 				if (to) {
@@ -258,12 +262,11 @@
 			})
 		});
 		console.log(newDivide)
-		console.log(dfa.transTable, transTable)
+		console.log(transTable)
+		dfa.states = states;
 		dfa.transTable = transTable;
 	}
 
-	//const dfa = buildDFA("(a*|b*)*");
 	const dfa = buildDFA("(a|b)*abb(a|b)*");
 	statesMinimize(dfa);
-	console.log(dfa)
 </script>
