@@ -113,7 +113,6 @@
 						letterMap[str[i]] = [];
 					}
 					letterMap[str[i]].push(k);
-
 					nullStack.push(false);
 					firstStack.push([k]);
 					lastStack.push([k]);
@@ -140,52 +139,16 @@
 		}, '');
 		return map[key] || (map[key] = ++index);
 	}
-	//  
-	function buildDFA(str) {
-		parseExpr(str + '#');
-		const dfa = {};
-		const states = [firstStack.pop()];
-		const transTable = {};
-		for (let n = 0; n < states.length; n++) {
-			// return;
-			const list = states[n];
-			Object.keys(letterMap).forEach(i => {
-				let group = letterMap[i].filter(j => list.includes(j));
-				if (i == '#' && group.length) {
-					if (!dfa.accept) {
-						dfa.accept = [];
-					}
-					dfa.accept.push(...group);
-					return;
-				};
-				let resGroup = group.reduce((total, current) => {
-					return [...new Set(total.concat(followMap[current]))];
-				}, []);
-				if (states.every((t) => t.concat(resGroup).reduce((total, j) => {
-					return total ^ j;
-				}, 0) != 0)) {
-					states.push(resGroup);
-				}
-				if (resGroup.length == 0) return;
-				let key = hash(list);
-				if (!transTable[key]) {
-					transTable[key] = {};
-				}
-				transTable[key][i] = hash(resGroup);
+	function hasState(array) {
 
-			});
-		}
-		dfa.symbols = Object.keys(letterMap);
-		dfa.states = Object.values(map);
-		dfa.transTable = transTable;
-		dfa.start = [hash(states[0])];
-		console.log(map)
-		dfa.accept = dfa.accept.reduce((total, current) => {
-			return [...new Set(Object.keys(map).filter(j => j.includes(String(current))).map(i => map[i]).concat(total))];
-		}, []);
-		dfa.accept.map(i => Object.keys(map).filter(j => j.includes(String(i))));
-		return dfa;
+		array = array.sort();
+		const key = array.reduce((total, current) => {
+			return total + String(current) + ',';
+		}, '');
+		return !!map[key];
 	}
+	//  
+	
 
 	function divideEqual(array1, array2) {
 		for (let i = 0; i < array1.length; i++) {
@@ -236,23 +199,22 @@
 						} else {
 							newDivide[group[index]].push(state);
 						}
-						console.log("============");
 					}
 				}
 			}
-			console.log(JSON.stringify(newDivide))
 			if (divideEqual(divide, newDivide)) break;
 		}
 		dfa.start = newDivide.filter(i => dfa.start.some(j => i.includes(j))).map(i => i[0]);
 		dfa.accept = newDivide.filter(i => dfa.accept.some(j => i.includes(j))).map(i => i[0]);
 		const transTable = {};
 		const states = [];
+		console.log(JSON.stringify(dfa.transTable), newDivide)
 		newDivide.forEach(i => {
 			const from = i[0];
 			states.push(from);
 			symbols.forEach(j => {
-				const to = dfa.transTable[from][j];
-				if (to) {
+				let to;
+				if (dfa.transTable[from] && (to = dfa.transTable[from][j])) {
 					const f = newDivide.find(k => k.includes(to))
 					if (!transTable[from]) {
 						transTable[from] = {};
@@ -266,7 +228,52 @@
 		dfa.states = states;
 		dfa.transTable = transTable;
 	}
+	function buildDFA(str) {
+		parseExpr(str + '#');
+		const dfa = {};
+		const states = [firstStack.pop()];
 
-	const dfa = buildDFA("(a|b)*abb(a|b)*");
-	statesMinimize(dfa);
+		const transTable = {};
+		for (let n = 0; n < states.length; n++) {
+			// return;
+			const list = states[n];
+			Object.keys(letterMap).forEach(i => {
+				let group = letterMap[i].filter(j => list.includes(j));
+				if (i == '#' && group.length) {
+					if (!dfa.accept) {
+						dfa.accept = [];
+					}
+					dfa.accept.push(...group);
+					return;
+				};
+				let resGroup = group.reduce((total, current) => {
+					return [...new Set(total.concat(followMap[current]))];
+				}, []);
+				if (resGroup.length == 0) return;
+
+				if (!hasState(resGroup)) {
+					states.push(resGroup);
+				}
+				let key = hash(list);
+				if (!transTable[key]) {
+					transTable[key] = {};
+				}
+				transTable[key][i] = hash(resGroup);
+
+			});
+		}
+		dfa.symbols = Object.keys(letterMap);
+		dfa.states = Object.values(map);
+		dfa.transTable = transTable;
+		dfa.start = [hash(states[0])];
+
+		dfa.accept = dfa.accept.reduce((total, current) => {
+			return [...new Set(Object.keys(map).filter(j => j.includes(String(current))).map(i => map[i]).concat(total))];
+		}, []);
+		statesMinimize(dfa);
+		console.log(str, dfa);
+		return dfa;
+	}
+
+	const dfa3 = buildDFA("(a|b)*a");
 </script>
