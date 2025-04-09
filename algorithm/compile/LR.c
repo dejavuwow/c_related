@@ -283,14 +283,35 @@
 //S -> AS | b
 //A -> SA | a
 //
-//S -> AS | b
-//A -> aB
-//B -> SAB | e
+//S' -> S		  1
+//S -> AS         2
+//S -> b          3
+//A -> aB		  4
+//B -> SAB	 	  5 
+//B -> e		  6
+//FOLLOW(S)	a, $
+//FOLLOW(A) a, b, $
+//FOLLOW(B) a, b, $
 //
-//l1 (l0:A) A.S,  S...
-//l2 (l0:a) a.B, B...       =A=> l1, =a=>l2
-//l3 (l1:S) AS.
-//l4 (l2:B) aB.
-//l5 (l2:S) S.AB 
-//l6 (l0:b) b.
+//l0 S' -> .S, S -> .AS, S -> .b, A -> .aB
+//l1 (l0:S) S' -> S.
+//l2 (l0:A) S -> A.S,  S -> .AS, S -> .b    A -> .aB     | =A=> l2,  =a=> l3
+//l3 (l0:a) A -> a.B,  B -> .SAB, B -> .,  S -> .AS, S -> .b, A -> .aB      |   =A=> l2, =b=> l5
+//l4 (l2:S) S -> AS.
+//l5 (l2:b) S -> b.
+//l6 (l3:B) A -> aB.
+//l7 (l3:S) B -> S.AB, A -> .aB | =a=> l3
+//l8 (l7:A) B -> SA.B, B -> .SAB, B -> ., S -> .AS, S -> .b, A -> .aB | =S=> l7, =A=> l2, =b=> l5
+//l9 (l8:B) B -> SAB.
 //
+//		a		b	$	 A	 B	 S
+//l0	S3		s5		 g2		 g1
+//l1	r1			acc	 		 
+//l2	s3      s5		 g2      g4  
+//l3    s3/r6   s5/r6 r6 g2  g6  g7
+//l4    r2          r2	  
+//l5    r3      r3  r3				
+//l6	r4		r4  r4		
+//l7    s3               g8
+//l8    s3/r6   s5/r6 r6  g2 g9  g7
+//l9	r5     r5   r5
