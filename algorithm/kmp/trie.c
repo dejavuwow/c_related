@@ -1,3 +1,10 @@
+/*
+ *将kmp算法应用于多个关键字字符串上：
+ *将多个关键字字符串构建一个trie树
+ *为构建的trie树每个节点添加失效节点，即该节点结尾的字符串的后缀是最长的某个关键字的前缀
+ *
+ *
+ * */
 #include <stdio.h>
 #include <stdlib.h>
 #define ALPHABET_SIZE 26

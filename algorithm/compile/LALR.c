@@ -1,6 +1,7 @@
 //有效项形如[A -> a.Bb, a]
 //规范LR
 //构造LR(1)项集族算法 
+//除了理想化的自我在他人身上的投射，除了想像孩子一样被怜惜照顾以外，我们爱过别人吗
 I CLOSURE(I) {
 	repeat
 		for (each [A -> a.Bb, a] in I) 
@@ -19,7 +20,7 @@ I GOTO(I, X) {
 	return CLOSURE(J);
 }
 
-void item(G') {
+void item(G') { //构造项集族
 	C //初始化为CLOSURE([S -> .S, $])
 	repeat
 		for (each I in C) 

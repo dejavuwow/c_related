@@ -350,35 +350,29 @@ int longestCommonSubsequence(char* text1, char* text2) {
 //
 //		for i in 1 to n
 //			for each production A -> a in P	
-//				a =*> s  #s为生成的最短字符串
-//				l = s.length
-//				dp[A][i][i] = min(dp[A][i][i], s contains w[i] ? l - 1 : l)
+//				dp[A][i][i] = min(dp[A][i][i], w[i] == a ? 0 : 1)
 //
 //		for l in 2 to n				
 //			for i in 1 to n - l + 1
 //				j = i + l - 1
 //				for k in i to j - 1
 //					for each production A -> BC in P
+//						#删除
+//						dp[A][i][j] = min(dp[A][i][j], dp[A][i][j - 1] + 1, dp[A][i + 1][j] + 1)
+//
+//						#插入
+//						if (C derive single char) dp[A][i][j] = min(dp[A][i][j], dp[B][i][j] + 1)
+//						if (B derive single char) dp[A][i][j] = min(dp[A][i][j], dp[C][i][j] + 1)
+//						
+//						#结合
 //						dp[A][i][j] = min(dp[A][i][j], dp[B][i][k] + dp[C][k + 1][j])
 //
 //				
-//				
-//A -> BC
-//dp[A][i][k] dp[B][k + 1][j]
-//
-//A -> BC
-//B -> DE
-//C -> FG
-//D -> a
-//E -> b
-//F -> MN
-//M -> c
-//N -> d
-//G -> e
-//
-//ab cde          abde           
-//a bcde
-//
-//B -> a   C -> cde
-//dp[B][i][k]
+//				A -> BC				
+//				B -> DE
+//				C -> FG
+//				D -> d
+//				E -> e
+//				F -> f
+//				G -> g
 //
