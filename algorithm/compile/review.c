@@ -21,8 +21,11 @@
 //while(A = queue.shift())
 //	J = CLOSURE([A -> a.b, #])
 //	for each INPUT X
-//		if ()
-//		if ([B -> y.Xz, c] in J AND c != #)
-//			queue.add([B -> yX.z, c])
+//		for each [B -> y.Xz, c] in J
+//			if (c != #)
+//				queue.add([B -> yX.z, c])
+//			if ([B -> y.Xz, #] in J)
+//				[A -> a.b].propagation.add([B -> yX.z])
+//				
 //
 //		
